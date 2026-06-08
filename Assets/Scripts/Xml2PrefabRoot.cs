@@ -49,8 +49,9 @@ public class Xml2PrefabRoot
     public void Parse()
     {
         Serialize = true;
-        Objects(Directory.GetFiles(VectorPaths.XmlRoot));
-        Buildings(Directory.GetFiles(VectorPaths.XmlRoot));
+        UseOnlyXML = false;
+        Objects(Directory.GetFiles("Assets/Resources/" + VectorPaths.XmlRoot));
+        Buildings(Directory.GetFiles("Assets/Resources/" + VectorPaths.XmlRoot));
         Levels();
     }
 
@@ -86,7 +87,7 @@ public class Xml2PrefabRoot
         {
             Directory.CreateDirectory("Assets/Resources/" + VectorPaths.LevelsPrefab);
         }
-        var files = Directory.GetFiles(VectorPaths.XmlLevels).Select(p => Path.GetFileName(p)).Where(s => !s.Contains("Trigger") && !s.Contains("buildings") && !s.Contains("objects") && !s.Contains(".meta") && !_excludeFromBuildFiles.Contains(s));
+        var files = Directory.GetFiles("Assets/Resources/" + VectorPaths.XmlLevels).Select(p => Path.GetFileName(p)).Where(s => !s.Contains("Trigger") && !s.Contains("buildings") && !s.Contains("objects") && !s.Contains(".meta") && !_excludeFromBuildFiles.Contains(s));
         foreach (var file in files)
         {
             var document = XmlUtils.OpenXMLDocument(VectorPaths.XmlLevels, file);
@@ -113,6 +114,10 @@ public class Xml2PrefabRoot
         }
         var root = document["Root"][rootNode];
         string filePath = "Assets/Resources/LevelContent/Prefabs/" + fileName + "/";
+        if (Directory.Exists(filePath))
+        {
+            return;
+        }
         Directory.CreateDirectory(filePath);
         GameObject obj = new GameObject();
         foreach (var (node, depth) in FindLowLevelNodes(root.ChildNodes))

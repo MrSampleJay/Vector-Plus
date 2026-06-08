@@ -14,7 +14,7 @@ public class debyg : MonoBehaviour
     [MenuItem("Debug/Test")]
     public static void Test()
     {
-        new Xml2PrefabRoot().ParseOnlyLevel("DOWNTOWN_STORY_01.xml");
+        ResourceManager.ClearTextureCache();
     }
 
     [MenuItem("Debug/Add Coins")]

@@ -20,34 +20,18 @@ namespace UI
 
         public Text GadgetsCount;
 
-        public FPSMeter FPSMeter;
-
-        public RunStats RunStats;
-
         public Image GadgetIcon;
 
+        public Image GadgetCooldownIcon;
+
+        public static GameplayView Current;
 
         public override void Init(GameplayScreen screen)
         {
-            if (Game.Instance.Snail)
-            {
-                ButtonPause.transform.parent.gameObject.SetActive(false);
-                ButtonReplay.transform.parent.gameObject.SetActive(false);
-                Gadgets.SetActive(false);
-                if (Game.Instance.SnailSett.ShowUI)
-                {
-                    FPSMeter.gameObject.SetActive(true);
-                    RunStats.gameObject.SetActive(true);
-                }
+            Current = this;
 
-            }
             ButtonPause.onClick.AddListener(() =>
             {
-                if (Game.Instance.Snail)
-                {
-                    LevelMainController.current.pauseRender = !LevelMainController.current.pauseRender;
-                    return;
-                }
                 if (!LevelMainController.current.CanPauseOrReload)
                 {
                     return;
@@ -57,7 +41,7 @@ namespace UI
             });
             ButtonReplay.onClick.AddListener(() =>
             {
-                if (!Game.Instance.Snail && !LevelMainController.current.CanPauseOrReload)
+                if (!LevelMainController.current.CanPauseOrReload)
                 {
                     return;
                 }
@@ -101,21 +85,14 @@ namespace UI
         {
             Caption.text = "You are playing " + string.Format("{0}-", UserDataManager.RuntimeInfo.CurentLocationType) + string.Format("{0}", UserDataManager.RuntimeInfo.CurrentStory + 1);
             InventoryOnUpdated(UserDataManager.Instance.ShopData);
-            
+
             actions.Gameplay.Restart.performed += _ => ButtonReplay.onClick.Invoke();
 
-            if (!Game.Instance.Snail)
-            {
-                actions.Gameplay.Gadget.performed += _ => UseGadgetsButton.onClick.Invoke();
-            }
+            actions.Gameplay.Gadget.performed += _ => UseGadgetsButton.onClick.Invoke();
         }
 
         private void InventoryOnUpdated(ShopData inventory)
         {
-            if (Game.Instance.Snail)
-            {
-                return;
-            }
             var equipped = inventory.IsEquipped("GADGET_FORCEBLASTER");
             var count = inventory.GetCount("GADGET_FORCEBLASTER");
             if (count < 1 || !equipped || UserDataManager.RuntimeInfo.IsHunterMode)
@@ -126,7 +103,7 @@ namespace UI
             Gadgets.SetActive(true);
             GadgetsCount.text = string.Format("{0}", count);
         }
-        
+
         public override void Back()
         {
             ButtonPause.onClick?.Invoke();

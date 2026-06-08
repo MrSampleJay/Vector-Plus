@@ -136,7 +136,7 @@ namespace Nekki.Vector.Core.Transformation
             for (int num1 = _Points.Count - 1; num > 1; num--)
             {
                 ReplaceZeroByEps(_Points[num1 - 1]);
-                _Points[num1].Round(100);
+                //_Points[num1].Round(100);
             }
             _Points.RemoveAt(0);
         }

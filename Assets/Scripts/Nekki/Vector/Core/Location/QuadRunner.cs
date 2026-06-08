@@ -300,8 +300,6 @@ namespace Nekki.Vector.Core.Location
             var endX = Math.Round(start.End.X, 1000);
             var endY = Math.Round(start.End.Y, 1000);
             bool hit2 = Hit(endX, endY, true);
-            //if (detector.Type == DetectorLine.DetectorType.Horizontal)
-                //Debug.Log($"Hit1: {hit} Hit2: {hit2} DetectorY: {(double)startY} RectangleY: {(float)_YQuad} HitY: {startY >= Utilites.Math.Round((double)rectangle.MinY, 1000)}");
             result.SetType(hit, hit2);
             if (result.Type > 0)
             {
@@ -522,7 +520,7 @@ namespace Nekki.Vector.Core.Location
 
         public virtual bool Hit(double x, double y, bool equality = false)
         {
-            return _rectangle.Contains(new Vector3d(x, y), 0.01f);
+            return _rectangle.Contains(x, y);
         }
 
         public Vector3d Add(Vector3d point)

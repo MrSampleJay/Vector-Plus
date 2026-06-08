@@ -150,25 +150,20 @@ namespace Nekki.Vector.Core.Scripts
 
         public static List<Sprite> GetFramesSequence(string p_name, float pivotX = 0, float pivotY = 1)
         {
-            if (ResourceManager.FileExists(p_name, out string atlasPath, ".plist", ".json") && ResourceManager.FileExists(p_name, out string imagePath, ".png", ".jpg", ".jpeg"))
-            {
-                try
-                {
-                    var sprites = AtlasDecoder.Decode(atlasPath, imagePath, pivotX, pivotY);
-                    if (sprites != null)
-                    {
-                        return sprites;
-                    }
-                }
-                catch (Exception e)
-                {
-                    DebugUtils.Dialog(e.Message, false, true);
-                }
-            }
-            else
+            string atlasPath = p_name;
+
+            if (p_name.StartsWith(Application.streamingAssetsPath) && !ResourceManager.FileExists(p_name, out atlasPath, ".plist", ".json"))
             {
                 DebugUtils.Dialog("Animation not found: " + Path.GetFileNameWithoutExtension(p_name), false, true);
             }
+
+
+            var sprites = AtlasDecoder.Decode(atlasPath, p_name, pivotX, pivotY);
+            if (sprites != null)
+            {
+                return sprites;
+            }
+
 
             return null;
         }

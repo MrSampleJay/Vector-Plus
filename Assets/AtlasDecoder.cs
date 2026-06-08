@@ -33,6 +33,19 @@ public static class AtlasDecoder
 
     public static Dictionary<string, List<Sprite>> Cache = new Dictionary<string, List<Sprite>>();
 
+    public static void ClearCache()
+    {
+        foreach (var sprites in Cache.Values)
+        {
+            foreach (var sprite in sprites)
+            {
+                UnityEngine.Object.Destroy(sprite);
+            }
+        }
+
+        Cache.Clear();
+    }
+
     // PUBLIC API
     public static List<Sprite> Decode(
         string atlasAssetPath,
@@ -71,26 +84,20 @@ public static class AtlasDecoder
         float pivotY = 1
     )
     {
-        if (!File.Exists(atlasAssetPath))
-        {
-            Debug.Log("gere");
+        string atlasText =
+    ResourcesLoader.LoadText(atlasAssetPath);
 
+        if (string.IsNullOrEmpty(atlasText))
+        {
             throw new FileNotFoundException(
-                "Atlas file not found",
+                "Atlas file not found or empty",
                 atlasAssetPath
             );
         }
 
-        string atlasText =
-            File.ReadAllText(atlasAssetPath);
-
-        byte[] imageBytes =
-            File.ReadAllBytes(imageAssetPath);
-
+            
         Texture2D atlasTexture =
-            new Texture2D(2, 2, TextureFormat.RGBA32, false);
-
-        atlasTexture.LoadImage(imageBytes);
+            ResourcesLoader.LoadTexture2D(imageAssetPath);
 
         if (atlasTexture == null)
         {
@@ -127,7 +134,9 @@ public static class AtlasDecoder
                     tex.height
                 ),
                 new Vector2(pivotX, pivotY),
-                1
+                1,
+                0,
+                SpriteMeshType.FullRect
             );
 
             sprite.name = kv.Key;
@@ -193,16 +202,30 @@ public static class AtlasDecoder
         result.SetPixels(empty);
 
         int startX = frame.ResultBox.x;
-        int startY = frame.ResultBox.y;
 
-        // unity has bottom-left origin
-        // python has top-left origin
-        // = flip Y properly
-
-        startY =
+        int startY =
             frame.RealSize.y
-            - startY
+            - frame.ResultBox.y
             - frame.Box.height;
+
+        if (
+            startX < 0 ||
+            startY < 0 ||
+            startX + frame.Box.width > result.width ||
+            startY + frame.Box.height > result.height
+        )
+        {
+            Debug.LogError(
+                $"Sprite outside bounds: {frame.Name}\n" +
+                $"Result texture: {result.width}x{result.height}\n" +
+                $"SetPixels: x={startX}, y={startY}, w={frame.Box.width}, h={frame.Box.height}\n" +
+                $"ResultBox: {frame.ResultBox}\n" +
+                $"RealSize: {frame.RealSize}\n" +
+                $"Rotated: {frame.Rotated}"
+            );
+
+            return result;
+        }
 
         result.SetPixels(
             startX,
@@ -211,6 +234,9 @@ public static class AtlasDecoder
             frame.Box.height,
             crop
         );
+
+        result.wrapMode = TextureWrapMode.Clamp;
+        result.filterMode = FilterMode.Trilinear;
 
         result.Apply();
 

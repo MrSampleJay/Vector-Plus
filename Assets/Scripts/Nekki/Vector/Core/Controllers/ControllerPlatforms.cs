@@ -64,10 +64,6 @@ namespace Nekki.Vector.Core.Controllers
         {
             platform.DetectorAffiliation(detector, cachedAffiliationResult);
             int index = Index(platform, detector.Type);
-            if (detector.Type == DetectorLine.DetectorType.Horizontal)
-            {
-                //Debug.Log(detector.Platform == null);
-            }
             if (cachedAffiliationResult.Type > 0 && index == -1)
             {
                 int p_side = platform.Side(detector, cachedAffiliationResult, _Model.Sign);

@@ -29,5 +29,7 @@ namespace Core._Common
         public static string Textures = CurrentResources + "/textures";
 
         public static string AnimatedTextures = CurrentResources + "/animatedtextures";
+
+        public static string Icons = CurrentResources + "/icons";
     }
 }

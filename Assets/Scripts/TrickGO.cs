@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
 using Core._Common;
+using UI;
 
 public class TrickGO : MonoBehaviour
 {
@@ -80,16 +81,12 @@ public class TrickGO : MonoBehaviour
 
     private void InitDisableState()
     {
-        Sprite sprite = null;
-        if (ResourceManager.FileExists(Application.streamingAssetsPath + "/icons/tricks/lock", out string path, ".png", ".jpg", ".jpeg"))
+        CoroutineRunner.Instance.Run(ResourcesLoader.LoadSpriteAsync(VectorPaths.Icons + "/tricks/lock", sprite =>
         {
-            sprite = ResourceManager.LoadSpriteFromExternal(path, new Vector2(0.5f, 0.5f), 1);
-        }
-        else
-        {
-            sprite = Resources.Load<Sprite>("LevelContent/Tricks/Icons/lock");
-        }
-        _trickIcon.sprite = sprite;
+            _trickIcon.sprite = sprite;
+
+        }, new Vector2(0.5f, 0.5f), 1));
+
     }
 
     private void InitActiveState(string itemName)
@@ -97,16 +94,11 @@ public class TrickGO : MonoBehaviour
         _animation.IsWork = true;
         _animation.Iterations = -1;
 
-        Sprite sprite = null;
-        if (ResourceManager.FileExists(Application.streamingAssetsPath + "/icons/tricks/TRACK_" + itemName, out string path, ".png", ".jpg", ".jpeg"))
+        CoroutineRunner.Instance.Run(ResourcesLoader.LoadSpriteAsync(VectorPaths.Icons + "/tricks/TRACK_" + itemName, sprite =>
         {
-            sprite = ResourceManager.LoadSpriteFromExternal(path, new Vector2(0.5f, 0.5f), 1);
-        }
-        else
-        {
-            sprite = Resources.Load<Sprite>("LevelContent/Tricks/Icons/TRACK_" + itemName);
-        }
-        _trickIcon.sprite = sprite;
+            _trickIcon.sprite = sprite;
+
+        }, new Vector2(0.5f, 0.5f), 1));
     }
 
     public void RunActivate()

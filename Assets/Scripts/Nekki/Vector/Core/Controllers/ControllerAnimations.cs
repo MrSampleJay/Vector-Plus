@@ -377,7 +377,7 @@ namespace Nekki.Vector.Core.Controllers
             List<Vector3d> frame = _Frames.GetFrame(0);
             List<Vector3d> frame2 = _Frames.GetFrame(1);
             ModelNode modelNode = null;
-            float num = (_PointFrame + 1) * 0.5f;
+            double num = (_PointFrame + 1) * 0.5f;
             int count = Mathf.Min(frame.Count, _ModelObject.NodesAll.Count);
             for (int i = 0; i < count; i++)
             {

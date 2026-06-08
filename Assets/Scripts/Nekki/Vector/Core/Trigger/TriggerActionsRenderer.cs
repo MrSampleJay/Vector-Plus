@@ -7,9 +7,12 @@ namespace Nekki.Vector.Core.Trigger
     {
         private static TriggerActionsRenderer _Current;
 
-        private TriggerRunner _Parent;
+        private readonly Queue<List<TriggerAction>> _PendingActions = new Queue<List<TriggerAction>>();
+        private readonly List<List<TriggerAction>> _DelayActions = new List<List<TriggerAction>>();
 
-        private List<List<TriggerAction>> _DelayActions = new List<List<TriggerAction>>();
+        private bool _IsProcessing;
+        private int _ActionsThisFrame;
+        private const int MaxActionsPerFrame = 1000;
 
         public static TriggerActionsRenderer Current
         {
@@ -19,27 +22,66 @@ namespace Nekki.Vector.Core.Trigger
                 {
                     _Current = new TriggerActionsRenderer();
                 }
+
                 return _Current;
             }
         }
 
         public static void Reset()
         {
+            Current._PendingActions.Clear();
             Current._DelayActions.Clear();
-        }
-
-        public void FreeMemory()
-        {
-            _Current = null;
+            Current._IsProcessing = false;
+            Current._ActionsThisFrame = 0;
         }
 
         public void AddActions(List<TriggerAction> p_actions)
         {
+            if (p_actions == null || p_actions.Count == 0)
+            {
+                return;
+            }
+
+            _PendingActions.Enqueue(p_actions);
+
+            if (!_IsProcessing)
+            {
+                ProcessPendingActions();
+            }
+        }
+
+        private void ProcessPendingActions()
+        {
+            _IsProcessing = true;
+
+            try
+            {
+                while (_PendingActions.Count > 0)
+                {
+                    if (_ActionsThisFrame++ > MaxActionsPerFrame)
+                    {
+                        break;
+                    }
+
+                    List<TriggerAction> actions = _PendingActions.Dequeue();
+                    RunActions(actions);
+                }
+            }
+            finally
+            {
+                _IsProcessing = false;
+            }
+        }
+
+        private void RunActions(List<TriggerAction> p_actions)
+        {
             int count = p_actions.Count;
+
             for (int i = 0; i < count; i++)
             {
                 bool isRunNext = true;
                 p_actions[i].Activate(ref isRunNext);
+
                 if (!isRunNext)
                 {
                     CopyActionToDelay(p_actions, i, count);
@@ -51,40 +93,60 @@ namespace Nekki.Vector.Core.Trigger
         public void CopyActionToDelay(List<TriggerAction> p_actions, int p_from, int size)
         {
             List<TriggerAction> list = new List<TriggerAction>(size - p_from);
+
             for (int num = size - 1; num >= p_from; num--)
             {
                 list.Add(p_actions[num]);
             }
+
             _DelayActions.Add(list);
         }
 
         public void Render()
         {
+            _ActionsThisFrame = 0;
+
+            ProcessDelayActions();
+            ProcessPendingActions();
+        }
+
+        private void ProcessDelayActions()
+        {
             if (_DelayActions.Count == 0)
             {
                 return;
             }
+
             for (int i = 0; i < _DelayActions.Count; i++)
             {
                 List<TriggerAction> list = _DelayActions[i];
                 bool isRunNext = false;
+
                 while (list.Count != 0)
                 {
-                    TriggerAction triggerRunnerAction = list[list.Count - 1];
-                    triggerRunnerAction.Activate(ref isRunNext);
+                    if (_ActionsThisFrame++ > MaxActionsPerFrame)
+                    {
+                        return;
+                    }
+
+                    TriggerAction action = list[list.Count - 1];
+                    action.Activate(ref isRunNext);
+
                     if (isRunNext)
                     {
-                        list.Remove(triggerRunnerAction);
+                        list.RemoveAt(list.Count - 1);
                         continue;
                     }
+
                     break;
                 }
             }
-            for (int num = _DelayActions.Count - 1; num >= 0; num--)
+
+            for (int i = _DelayActions.Count - 1; i >= 0; i--)
             {
-                if (_DelayActions[num].Count == 0)
+                if (_DelayActions[i].Count == 0)
                 {
-                    _DelayActions.RemoveAt(num);
+                    _DelayActions.RemoveAt(i);
                 }
             }
         }

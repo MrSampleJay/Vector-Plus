@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UI;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Game
@@ -77,40 +78,9 @@ public class Game
     public IEnumerator Start()
     {
         ScreenManager = new ScreenManager();
-        if (Snail)
-        {
-            if (SnailSett.HunterMode)
-            {
-                UserDataManager.RuntimeInfo.IsHunterMode = true;
-                UserDataManager.Instance.SetHunterMode();
-            }
-            _isInited = true;
-            BackButtonManager.Instance.OnBackButton += OnBackButton;
 
-            DebugUtils.StartTimer("load");
+        yield return new WaitForEndOfFrame();
 
-            SceneManager.LoadScene("Scenes/Level");
-
-            yield return null;
-
-            LevelMainController.current.pauseRender = true;
-
-            yield return ScreenManager.FadeInCoroutine();
-
-            yield return null;
-
-            ScreenManager.Show<GameplayScreen>(false, false);
-
-            yield return ScreenManager.FadeOutCoroutine();
-
-            DebugUtils.StopTimerWithMessage("load time", "load");
-
-
-            yield return null;
-
-            LevelMainController.current.pauseRender = false;
-            yield break;
-        }
         var payload = new VideoScreenPayloadData("intro.mp4", () =>
         {
             ScreenManager.Show<LobbyScreen>(true, false);
@@ -123,7 +93,7 @@ public class Game
         });
         ScreenManager.Show<VideoScreen, VideoScreenPayloadData>(payload, true, false);
         BackButtonManager.Instance.OnBackButton += OnBackButton;
-        yield return false;
+
     }
 
     private void OnBackButton()

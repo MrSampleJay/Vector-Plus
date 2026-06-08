@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace Nekki.Vector.Core.Scripts
 {
-	public class InvertCamera : MonoBehaviour
-	{
+    public class InvertCamera : MonoBehaviour
+    {
         [SerializeField]
         private Vector3 _Scale = new Vector3(1f, -1f, 1f);
 

@@ -47,6 +47,13 @@ public class LevelMainController
 
     private bool _canShowAd;
 
+    private int _consecutiveLossesMax = 3;
+    private int _consecutiveLosses;
+    private float _lastInputTime;
+    private bool _pauseAfterReload;
+
+    private const float AFK_DELAY = 10f;
+
     public static LevelMainController current
     {
         get;
@@ -147,10 +154,13 @@ public class LevelMainController
         current.slowModeFrames = 1;
         current.levelSceneController = levelSceneController;
         current.InitLevel();
+        current.pauseRender = true;
     }
 
     public void InitLevel()
     {
+        _consecutiveLosses = 0;
+        _lastInputTime = Time.unscaledTime;
         _canShowAd = false;
         _Location = CreateLocation();
         AddModeles();
@@ -160,8 +170,6 @@ public class LevelMainController
         SoundsManager.Instance.PlayBackground(_Location.Music);
         _Location.Start();
         CanPauseOrReload = true;
-        ResourceManager.textureCache.Clear();
-        AtlasDecoder.Cache.Clear();
         Resources.UnloadUnusedAssets();
         GC.Collect();
     }
@@ -234,6 +242,8 @@ public class LevelMainController
 
     public void Render()
     {
+        CheckAfkPause();
+
         if (!_pauseRender && !_tutorialPause)
         {
             _Camera.UpdatePosition();
@@ -245,7 +255,32 @@ public class LevelMainController
     public void HandleNewInput(KeyVariables key)
     {
         _inputBeen = true;
+
+        _lastInputTime = Time.unscaledTime;
+
         UserModel.ControllerKeys.SetKeyVariable(key);
+    }
+
+    private void CheckAfkPause()
+    {
+        if (_consecutiveLosses < _consecutiveLossesMax)
+            return;
+
+        float inactiveTime =
+            Time.unscaledTime - _lastInputTime;
+
+        if (inactiveTime < AFK_DELAY)
+            return;
+
+        // already scheduled
+        if (_pauseAfterReload)
+            return;
+
+        _pauseAfterReload = true;
+
+        Debug.Log(
+            $"AFK due to {_consecutiveLosses}/{_consecutiveLossesMax} consecutive non-Win EndGames and no key presses"
+        );
     }
 
     public void TutorialAreaActivate(TutorialAreaRunner area)
@@ -329,10 +364,11 @@ public class LevelMainController
         if (!IsWin && !IsDeath)
         {
             {
+                _consecutiveLosses++;
                 CanPauseOrReload = false;
                 modelHuman.IsGadget = false;
                 modelHuman.Death(GameEndType.GE_MURDER);
-                Debug.Log("Murder");
+                Debug.Log($"Murder [{_consecutiveLosses}/{_consecutiveLossesMax}]");
                 var s = DOTween.Sequence();
                 s.AppendInterval(0.5f);
                 s.AppendCallback(() => { Reload(); });
@@ -348,11 +384,12 @@ public class LevelMainController
         {
             if (!modelHuman.IsBot)
             {
+                _consecutiveLosses++;
                 CanPauseOrReload = false;
                 modelHuman.IsGadget = false;
                 modelHuman.Death(GameEndType.GE_DEATH);
                 modelHuman.StartPhysics();
-                Debug.Log("Death");
+                Debug.Log($"Death [{_consecutiveLosses}/{_consecutiveLossesMax}]");
                 var s = DOTween.Sequence();
                 s.AppendInterval(time);
                 s.AppendCallback(() => { Reload(); });
@@ -367,11 +404,12 @@ public class LevelMainController
         if (!IsWin && !IsDeath)
         {
             {
+                _consecutiveLosses++;
                 LocationCamera.Current.Stop();
                 CanPauseOrReload = false;
                 modelHuman.IsGadget = false;
                 modelHuman.Death(GameEndType.GE_LOSS);
-                Debug.Log("Loss");
+                Debug.Log($"Loss [{_consecutiveLosses}/{_consecutiveLossesMax}]");
                 var s = DOTween.Sequence();
                 s.AppendInterval(time);
                 s.AppendCallback(() => { Reload(); });
@@ -385,9 +423,10 @@ public class LevelMainController
     {
         if (!IsWin && !IsDeath)
         {
+            _consecutiveLosses++;
             CanPauseOrReload = false;
             modelHuman.IsGadget = false;
-            Debug.Log("Arrest");
+            Debug.Log($"Arrest [{_consecutiveLosses}/{_consecutiveLossesMax}]");
             var s = DOTween.Sequence();
             s.AppendInterval(1);
             s.AppendCallback(() => { Reload(); });
@@ -398,7 +437,16 @@ public class LevelMainController
 
     public void ClearScene()
     {
-        SceneManager.LoadScene("UI");
+
+        Object.Destroy(GameObject.Find("Level_root_object"));
+
+        ResourceManager.ClearTextureCache();
+        AtlasDecoder.ClearCache();
+
+        SceneManager.UnloadSceneAsync("Level");
+
+        Resources.UnloadUnusedAssets();
+        GC.Collect();
     }
 
     public void ReloadButton()
@@ -422,6 +470,13 @@ public class LevelMainController
         CanPauseOrReload = true;
         IsDeath = false;
         _FrameCount = 0;
+
+        if (_pauseAfterReload)
+        {
+            _pauseAfterReload = false;
+            Game.Instance.ScreenManager.Show<GameplayPauseScreen>(false, false);
+            pauseRender = true;
+        }
     }
 
     public List<ModelHuman> GetModelsByNames(List<string> modelHumanNames)

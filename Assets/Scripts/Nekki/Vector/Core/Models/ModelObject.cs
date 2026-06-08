@@ -13,7 +13,7 @@ namespace Nekki.Vector.Core.Models
     {
         private Model _Parent;
 
-        private GameObject _Container = new GameObject("[Model]");
+        public GameObject _Container = new GameObject("[Model]");
 
         private List<ModelRender> _Renders = new List<ModelRender>();
 

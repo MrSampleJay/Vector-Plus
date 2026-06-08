@@ -193,7 +193,7 @@ namespace UI
             {
                 var storyInfo = currentStoryModeInfos[i];
                 var storyItem = GetStoryItem(i);
-                storyItem.Icon.sprite = ResourcesLoader.LoadStoriesSprite(storyInfo.Name.Replace("_HUNTER", ""));
+                CoroutineRunner.Instance.Run(ResourcesLoader.LoadStoriesSpriteAsync(storyInfo.Name.Replace("_HUNTER", ""), loaded => storyItem.Icon.sprite = loaded));
                 var points = playerData.GameStats.GetPointsCount(storyInfo.Name);
                 if (points < 1)
                 {

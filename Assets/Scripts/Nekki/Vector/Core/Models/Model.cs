@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Nekki.Vector.Core.Controllers;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Node;
+using Nekki.Vector.Core.Scripts;
 using UnityEngine;
 using Collision = Nekki.Vector.Core.Result.Collision;
 

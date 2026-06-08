@@ -98,7 +98,7 @@ namespace Nekki.Vector.Core.Transformation
                 num2 = Math.Pow(num, num5 + 1);
                 num3 += num2 * (double)vector3f2.X;
                 num4 += num2 * (double)vector3f2.Y;
-                _Points.Add(new Point((float)num3, (float)num4));
+                _Points.Add(new Point((int)num3, (int)num4));
                 num += 1f / (float)_Frames;
             }
             _Points.Add(vector3f2);

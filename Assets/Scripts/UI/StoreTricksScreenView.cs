@@ -57,8 +57,14 @@ namespace UI
 					var desc = LocalizationManager.Instance.GetTranslation("store_blaster_des");
 					payloadAdditional = new BuyItemAdditionalPayloadData(desc, true);
 				}
-				var payload = new BuyItemPayloadData(ResourcesLoader.LoadItemSprite(trick.IconId), trick.Id, trick.ItemType, canEquip, payloadAdditional, index);
-                Game.Instance.ScreenManager.Popup<BuyItemPopup, BuyItemPayloadData>(payload);
+
+				CoroutineRunner.Instance.Run(ResourcesLoader.LoadItemSpriteAsync(trick.IconId, loaded =>
+				{
+                    var payload = new BuyItemPayloadData(loaded, trick.Id, trick.ItemType, canEquip, payloadAdditional, index);
+                    Game.Instance.ScreenManager.Popup<BuyItemPopup, BuyItemPayloadData>(payload);
+                }));
+
+
 			}
 		}
 
@@ -135,7 +141,7 @@ namespace UI
 					}
 					Buy(item, canEquip, index);
 				});
-				obj.Icon.sprite = ResourcesLoader.LoadItemSprite(item.IconId);
+				CoroutineRunner.Instance.Run(ResourcesLoader.LoadItemSpriteAsync(item.IconId, loaded => obj.Icon.sprite = loaded));
 				obj.Set(LocalizationManager.Instance.GetTranslationByID(item.Id), false, count > 0, isBought, item.Price, item.IconId);
 				var equipText = UserDataManager.Instance.ShopData.IsEquipped(item.Id) ? "store_unequip_but" : "store_equip_but";
 				obj.EquipButtonText.text = LocalizationManager.Instance.GetTranslation(equipText);

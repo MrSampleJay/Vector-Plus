@@ -156,7 +156,7 @@ namespace Nekki.Vector.Core.Location
         {
             _transformManager.Update();
             RenderModels();
-            //_transformManager.RemoveEndedTransformation();
+            _transformManager.RemoveEndedTransformation();
         }
 
         public void RenderModels()

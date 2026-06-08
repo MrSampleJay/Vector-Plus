@@ -5,6 +5,7 @@ using Nekki.Vector.Core.Utilites;
 using System;
 using System.IO;
 using System.Xml;
+using UI;
 using UnityEngine;
 using Xml2Prefab;
 using Sprite = UnityEngine.Sprite;
@@ -132,36 +133,47 @@ namespace Nekki.Vector.Core.Location
             }
             _SpriteRender = UnityObject.AddComponent<SpriteRenderer>();
             _SpriteRender.flipY = true;
-            Sprite sprite = null;
             string path = VectorPaths.Textures + "/" + _Name;
 
-            if (ResourceManager.FileExists(path, out string imagePath, ".png", ".jpg", ".jpeg"))
+            CoroutineRunner.Instance.Run(ResourcesLoader.LoadSpriteAsync(path, sprite =>
             {
-                sprite = ResourceManager.LoadSpriteFromExternal(imagePath, new Vector2(0, 1), 1);
-            }
+                if (sprite == null)
+                {
+                    DebugUtils.Dialog("Image not found: " + _Name, false);
+                    return;
+                }
+                _SpriteRender.sprite = sprite;
+
+                float width = sprite.rect.width;
+                float height = sprite.rect.height;
+                if (_Support != null)
+                {
+                    _Transformation[0, 0] = _Transformation[0, 0] / width;
+                    _Transformation[0, 1] = _Transformation[0, 1] / width;
+                    _Transformation[1, 0] = _Transformation[1, 0] / height;
+                    _Transformation[1, 1] = _Transformation[1, 1] / height;
+                   
+                }
+                else
+                {
+                    if (Matrix.IsIdentity(_Transformation))
+                    {
+                        _CachedTransform.localScale = new Vector3(_OriginalWidth / width, _OriginalHeight / height);
+
+                    }
+                    else
+                    {
+                        _CachedTransform.localScale = new Vector3(_CachedTransform.localScale.x / width, _CachedTransform.localScale.y / height, 1f);
+
+                    }
+                }
+
+                Transform();
+                _DefaultScale.Set(_CachedTransform.localScale);
+                _DefaulRotation.Set(_CachedTransform.localEulerAngles);
+
+            }, Vector2.up, 1));
             
-            if (sprite == null)
-            {
-                DebugUtils.Dialog("Image not found: " + _Name, false);
-                return;
-            }
-            _SpriteRender.sprite = sprite;
-            float width = sprite.rect.width;
-            float height = sprite.rect.height;
-            if (_Support != null)
-            {
-                _Transformation[0, 0] = _Transformation[0, 0] / width;
-                _Transformation[0, 1] = _Transformation[0, 1] / width;
-                _Transformation[1, 0] = _Transformation[1, 0] / height;
-                _Transformation[1, 1] = _Transformation[1, 1] / height;
-                return;
-            }
-            if (Matrix.IsIdentity(_Transformation))
-            {
-                _CachedTransform.localScale = new Vector3(_OriginalWidth / width, _OriginalHeight / height);
-                return;
-            }
-            _CachedTransform.localScale = new Vector3(_CachedTransform.localScale.x / width, _CachedTransform.localScale.y / height, 1f);
         }
 
         protected void MakeAnimationAndRun()
@@ -185,10 +197,16 @@ namespace Nekki.Vector.Core.Location
                 if (Matrix.IsIdentity(_Transformation))
                 {
                     _CachedTransform.localScale = new Vector3(_OriginalWidth / width, _OriginalHeight / height);
-                    return;
                 }
-                _CachedTransform.localScale = new Vector3(_CachedTransform.localScale.x / width, _CachedTransform.localScale.y / height, 1f);
+                else
+                {
+                    _CachedTransform.localScale = new Vector3(_CachedTransform.localScale.x / width, _CachedTransform.localScale.y / height, 1f);
+                }
             }
+
+            Transform();
+            _DefaultScale.Set(_CachedTransform.localScale);
+            _DefaulRotation.Set(_CachedTransform.localEulerAngles);
         }
 
         public override bool Render()
@@ -200,10 +218,8 @@ namespace Nekki.Vector.Core.Location
         {
             base.InitRunner(point, serialize);
             UpdateUnityObjectPosition(Position);
-            Transform();
             UpdateColor();
-            _DefaultScale.Set(_CachedTransform.localScale);
-            _DefaulRotation.Set(_CachedTransform.localEulerAngles);
+
         }
 
         public virtual void Init()
@@ -273,14 +289,14 @@ namespace Nekki.Vector.Core.Location
 
         public override void TransformResize(Point size)
         {
+
             var scale = _CachedTransform.localScale;
             scale.x = size.X / _SpriteRender.sprite.texture.width;
             scale.y = size.Y / _SpriteRender.sprite.texture.height;
             _CachedTransform.localScale = scale;
 
-
-            _ImageWidth = scale.x;
-            _ImageHeight = scale.y;
+            _ImageWidth = size.X;
+            _ImageHeight = size.Y;
         }
 
         public void UpdateColor()

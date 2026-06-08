@@ -11,9 +11,9 @@ namespace Nekki.Vector.Core.Gadgets
 			AddGadget(new GadgetKillBot());
 		}
 
-		private void AddGadget(GadgetKillBot gadgetKillBot)
+		private void AddGadget(Gadget gadget)
 		{
-			_allGadgets.Add(gadgetKillBot.gadgetType, gadgetKillBot);
+			_allGadgets.Add(gadget.gadgetType, gadget);
 		}
 
 		public void ActivateGadget(GadgetType gadgetType)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using Nekki.Vector.Core;
@@ -77,20 +78,16 @@ namespace UI
             var storyInfo = UserDataManager.Instance.CurrentBalanceLocation.CurrentStoryModeStoryInfos[UserDataManager.RuntimeInfo.CurrentStory];
             CurrentTrackInfo.Current.LocationFile = storyInfo.Name.Replace("_HUNTER", "") + ".xml";
 
-            yield return SceneManager.LoadSceneAsync("Scenes/Level");
-
             DebugUtils.StartTimer("load");
 
+            yield return SceneManager.LoadSceneAsync("Scenes/Level", LoadSceneMode.Additive);
 
-            while (LevelMainController.current == null)
-            {
-                yield return null;
-            }
-
-            DebugUtils.StopTimerWithMessage("load time", "load");
+            yield return new WaitUntil(() => LevelMainController.current != null);
 
             LevelMainController.current.pauseRender = true;
 
+            var time = DebugUtils.StopTimer("load");
+            Debug.Log("load time: " + TimeSpan.FromMilliseconds(time).TotalSeconds);
 
             if (storyInfo.CutsceneStart != null)
             {
@@ -105,13 +102,9 @@ namespace UI
 
             yield return sm.FadeInCoroutine();
 
-            yield return null;
-
             sm.Show<GameplayScreen>(false, false);
 
             yield return sm.FadeOutCoroutine();
-
-            yield return null;
 
             LevelMainController.current.pauseRender = false;
         }

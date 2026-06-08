@@ -192,14 +192,17 @@ public class SoundsManager : MonoBehaviour
             return;
         }
         AudioSourceBackground.Stop();
-        AudioSourceBackground.clip = ResourcesLoader.LoadMusicClip(musicName);
-        AudioSourceBackground.loop = loop;
-        if (AudioSourceBackground.clip == null)
+        StartCoroutine(ResourcesLoader.LoadMusicClipAsync(musicName, loaded =>
         {
-            Debug.LogError("Music clip not found " + musicName);
-            return;
-        }
-        AudioSourceBackground.Play();
+            if (loaded == null)
+            {
+                Debug.LogError("Music clip not found " + musicName);
+                return;
+            }
+            AudioSourceBackground.clip = loaded;
+            AudioSourceBackground.loop = loop;
+            AudioSourceBackground.Play();
+        }));
     }
 
     // ======== SFX: Single / Parallel ========
@@ -215,51 +218,58 @@ public class SoundsManager : MonoBehaviour
     {
         foreach (var name in soundNames)
         {
-            var clip = ResourcesLoader.LoadAudioClip(name);
-            if (clip == null)
+            StartCoroutine(ResourcesLoader.LoadAudioClipAsync(name, clip =>
             {
-                Debug.LogError("Clip not found " + name);
-                continue;
-            }
-            var src = GetFreeSfxSource();
-            src.pitch = 1f;
-            src.spatialBlend = 0f;
-            src.PlayOneShot(clip);
+                if (clip == null)
+                {
+                    Debug.LogError("Clip not found " + name);
+                    return;
+                }
+                var src = GetFreeSfxSource();
+                src.pitch = 1f;
+                src.spatialBlend = 0f;
+                src.PlayOneShot(clip);
+            }));
+
         }
     }
 
     /// <summary>Play one sound once with custom volume and optional pitch.</summary>
     public void PlaySoundsOnce(string soundName, float volume, float pitch = 1f)
     {
-        var clip = ResourcesLoader.LoadAudioClip(soundName);
-        if (clip == null)
+        StartCoroutine(ResourcesLoader.LoadAudioClipAsync(soundName, clip =>
         {
-            Debug.LogError("Clip not found " + soundName);
-            return;
-        }
-        var src = GetFreeSfxSource();
-        src.pitch = pitch;
-        src.spatialBlend = 0f;
-        src.PlayOneShot(clip, Mathf.Clamp01(volume));
+            if (clip == null)
+            {
+                Debug.LogError("Clip not found " + soundName);
+                return;
+            }
+            var src = GetFreeSfxSource();
+            src.pitch = pitch;
+            src.spatialBlend = 0f;
+            src.PlayOneShot(clip, Mathf.Clamp01(volume));
+        }));
     }
 
     /// <summary>3D variant at a world position.</summary>
     public void PlaySoundAt(string soundName, Vector3 position, float volume = 1f, float pitch = 1f, float spatialBlend = 1f)
     {
-        var clip = ResourcesLoader.LoadAudioClip(soundName);
-        if (clip == null)
+        StartCoroutine(ResourcesLoader.LoadAudioClipAsync(soundName, clip =>
         {
-            Debug.LogError("Clip not found " + soundName);
-            return;
-        }
-        var src = GetFreeSfxSource();
-        src.transform.position = position;
-        src.pitch = pitch;
-        src.spatialBlend = Mathf.Clamp01(spatialBlend);
-        src.minDistance = 1f;
-        src.maxDistance = 25f;
-        src.rolloffMode = AudioRolloffMode.Linear;
-        src.PlayOneShot(clip, Mathf.Clamp01(volume));
+            if (clip == null)
+            {
+                Debug.LogError("Clip not found " + soundName);
+                return;
+            }
+            var src = GetFreeSfxSource();
+            src.transform.position = position;
+            src.pitch = pitch;
+            src.spatialBlend = Mathf.Clamp01(spatialBlend);
+            src.minDistance = 1f;
+            src.maxDistance = 25f;
+            src.rolloffMode = AudioRolloffMode.Linear;
+            src.PlayOneShot(clip, Mathf.Clamp01(volume));
+        }));        
     }
 
     // ======== SFX: Sequential ========
@@ -285,7 +295,10 @@ public class SoundsManager : MonoBehaviour
 
         foreach (var name in soundNames)
         {
-            var clip = ResourcesLoader.LoadAudioClip(name);
+            AudioClip clip = null;
+
+            yield return ResourcesLoader.LoadAudioClipAsync(name, loaded => clip = loaded);
+
             if (clip == null)
             {
                 Debug.LogError("Clip not found " + name);

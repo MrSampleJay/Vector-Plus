@@ -33,8 +33,11 @@ namespace UI
             _lastPayload = payload;
             VideoPlayer.gameObject.SetActive(true);
             VideoPlayer.Prepare();
-            VideoPlayer.prepareCompleted += vp => vp.Play();
-			_lastPayload.IsPlaying = true;
+			VideoPlayer.prepareCompleted += vp =>
+			{
+                vp.Play();
+                _lastPayload.IsPlaying = true;
+            };
             VideoPlayer.loopPointReached += OnFinished;
 		}
 

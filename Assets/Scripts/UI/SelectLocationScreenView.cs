@@ -93,7 +93,10 @@ namespace UI
                     locationItem.Lock.gameObject.SetActive(false);
                 }
                 string name = info.Name.Replace("_HUNTER", "");
-                locationItem.IconLocation.sprite = ResourcesLoader.LoadLocationSprite(name);
+                CoroutineRunner.Instance.Run(ResourcesLoader.LoadLocationSpriteAsync(name, loaded =>
+                {
+                    locationItem.IconLocation.sprite = loaded;
+                }));
                 if (UserDataManager.RuntimeInfo.IsHunterMode)
                 {
                     locationItem.HunterCaption.gameObject.SetActive(true);

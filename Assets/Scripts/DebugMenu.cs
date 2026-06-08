@@ -1,18 +1,70 @@
+using Nekki.Vector.GUI.Scenes.Run;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DebugMenu : MonoBehaviour
 {
-	[SerializeField]
-	private Button _win1Stars;
+    public FPSMeter FPSMeter;
 
-	[SerializeField]
-	private Button _win2Stars;
+    public RunStats RunStats;
 
-	[SerializeField]
-	private Button _win3Stars;
+    protected PlayerInputActions actions;
 
-	public void Init()
+    private void Awake()
+    {
+        if (!Game.Instance.Snail)
+        {
+            return;
+        }
+
+        if (actions == null)
+            actions = new PlayerInputActions();
+    }
+
+    private void OnEnable()
+    {
+        if (!Game.Instance.Snail)
+        {
+            return;
+        }
+
+        actions.Enable();
+
+        actions.UI.Back.performed += _ =>
+        {
+            if (LevelMainController.current == null)
+            {
+                return;
+            }
+            LevelMainController.current.pauseRender = !LevelMainController.current.pauseRender;
+        };
+
+        actions.Gameplay.Restart.performed += _ =>
+        {
+            if (LevelMainController.current == null || !LevelMainController.current.CanPauseOrReload)
+            {
+                return;
+            }
+            LevelMainController.current.ReloadButton();
+        };
+    }
+
+    private void OnDisable()
+    {
+        if (!Game.Instance.Snail)
+        {
+            return;
+        }
+
+        actions.Disable();
+    }
+
+    public void Init()
 	{
+        if (Game.Instance.Snail && Game.Instance.SnailSett.ShowUI)
+        {
+            FPSMeter.gameObject.SetActive(true);
+            RunStats.gameObject.SetActive(true);
+        }
 	}
 }
