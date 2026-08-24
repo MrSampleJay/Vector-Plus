@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Models;
 using Nekki.Vector.Core.Node;
 using Nekki.Vector.Core.Trigger.Events;
+using System.Collections.Generic;
 
 namespace Nekki.Vector.Core.Trigger
 {

@@ -1,9 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Xml;
 using Nekki.Vector.Core.Detector;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Models;
+using Nekki.Vector.Core.Transformation;
+using System;
+using System.Collections.Generic;
+using System.Xml;
+using UnityEditor;
+using UnityEngine;
+using static Nekki.Vector.Core.Node.NodeName;
 
 namespace Nekki.Vector.Core.Animation
 {
@@ -19,7 +23,7 @@ namespace Nekki.Vector.Core.Animation
 
         private readonly int _triggerNameHash;
 
-        private static Random _Random;
+        private static System.Random _Random;
 
         public static List<AnimationReaction> Reactions
         {
@@ -176,10 +180,16 @@ namespace Nekki.Vector.Core.Animation
             }
         }
 
+        //public string File
+        //{
+        //    get;
+        //    set;
+        //}
+
         static AnimationReaction()
         {
             Reactions = new List<AnimationReaction>();
-            _Random = new Random();
+            _Random = new System.Random();
         }
 
         public AnimationReaction(string name, int frame)
@@ -193,6 +203,7 @@ namespace Nekki.Vector.Core.Animation
 
         public AnimationReaction(XmlNode node)
         {
+            //File = file;
             Sides = new List<int>();
             NodesWi = new List<string>();
             Name = node.Name;

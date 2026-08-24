@@ -1,4 +1,4 @@
-using Nekki.Vector.Core.Utilites;
+using System;
 using UnityEngine;
 
 namespace Nekki.Vector.Core.Camera
@@ -19,6 +19,12 @@ namespace Nekki.Vector.Core.Camera
         private int _CameraFrame;
 
         private float _Time;
+
+        public float Time
+        {
+            get { return _Time; }
+            set { _Time = value; }
+        }
 
         private GameObject _Layer;
 
@@ -59,11 +65,12 @@ namespace Nekki.Vector.Core.Camera
             _Layer.transform.position = vector;
         }
 
-        public void Zooming(float p_value, bool p_isStart)
+        public void Zooming(float p_value, bool p_isStart, int frames = 30)
         {
+            _Time = frames;
             _Frame = 0;
             _Scale = _ZoomValue;
-            _ZoomValue = Math.Round(p_value / (p_value + _Factor * (1 - p_value)), 10);
+            _ZoomValue = Utilites.Math.Round(p_value / (p_value + _Factor * (1 - p_value)), 10);
             if (!p_isStart)
             {
                 _IsZoom = true;
@@ -86,6 +93,7 @@ namespace Nekki.Vector.Core.Camera
                 return;
             }
             _IsZoom = false;
+            _Time = 30;
         }
     }
 }

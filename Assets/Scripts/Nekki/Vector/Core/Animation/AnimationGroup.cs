@@ -36,7 +36,10 @@ namespace Nekki.Vector.Core.Animation
 		{
 			return GetGroup(name).Reactions;
 		}
-
+		public static void AddReactions(string name, List<AnimationReaction> additionalReactions)
+		{
+			Groups[name].Reactions.AddRange(additionalReactions);
+		}
 		public static void ClearGroups()
 		{
 			Groups.Clear();

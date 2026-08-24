@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Xml;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Models;
 using Nekki.Vector.Core.Trigger.Actions;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace Nekki.Vector.Core.Trigger
 {
@@ -61,6 +61,10 @@ namespace Nekki.Vector.Core.Trigger
                     return new TA_Execute(p_node, p_parent);
                 case "ShowLog":
                     return new TA_ShowLog(p_node, p_parent);
+                case "Impulse":
+                    return new TA_Impulse(p_node, p_parent);
+                case "Location":
+                    return new TA_Location(p_node, p_parent);
                 default:
                     return null;
             }

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Nekki.Vector.Core.Animation;
 using Nekki.Vector.Core.Animation.Events;
 using Nekki.Vector.Core.Camera;
@@ -8,7 +5,15 @@ using Nekki.Vector.Core.Detector;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Models;
 using Nekki.Vector.Core.Node;
+using Nekki.Vector.Core.Result;
+using Nekki.Vector.Core.Transformation;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static Nekki.Vector.Core.Trigger.Actions.TA_MessageOnScreen;
+using static UnityEngine.GraphicsBuffer;
 using AnimationInfo = Nekki.Vector.Core.Animation.AnimationInfo;
 using Collision = Nekki.Vector.Core.Result.Collision;
 
@@ -65,7 +70,6 @@ namespace Nekki.Vector.Core.Controllers
             get;
             private set;
         }
-
         public int Sign
         {
             get;
@@ -467,7 +471,12 @@ namespace Nekki.Vector.Core.Controllers
                 }
                 for (int i = 0; i < sounds.Count; i++)
                 {
-                    sounds[i].Play((float)num);
+                    string voice = string.Empty;
+                    if (_Model is ModelHuman human)
+                    {
+                        voice = human.Voice;
+                    }
+                    sounds[i].Play((float)num, voice);
                 }
             }
         }

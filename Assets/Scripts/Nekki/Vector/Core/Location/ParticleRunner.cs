@@ -1,6 +1,6 @@
-using Nekki.Vector.Core.Controllers;
 using Nekki.Vector.Core.Location.Animation;
 using Nekki.Vector.Core.Node;
+using Nekki.Vector.Core.Controllers;
 using UnityEngine;
 using Xml2Prefab;
 
@@ -19,7 +19,7 @@ namespace Nekki.Vector.Core.Location
 		private ModelNode _node;
 
 		public ParticleRunner(float p_x, float p_y, float p_width, float p_height, string p_name)
-			: base(p_name, p_x, p_y, p_width, p_height, true)
+			: base(p_name, p_x, p_y, p_width, p_height, true, 1)
 		{
 			_isRender = false;
 			_TypeClass = RunnerType.Particle;
@@ -33,23 +33,17 @@ namespace Nekki.Vector.Core.Location
 			_UnityObject.AddComponent<Xml2PrefabParticleContainer>().Init(_Name, _DefautPosition.X, _DefautPosition.Y, _Width, _Height, TransformationDataRaw, Choice);
 		}
 
-		public override void Init(float pivotX = 0.5f, float pivotY = 0.5f)
+		public override void Init()
 		{
 			if (_Name == "p_glass1_mini")
 			{
 				Name = "glass_1";
             }
-			base.Init(pivotX, pivotY);
+			base.Init();
 			_CachedTransform.localScale *= Random.Range(0.5f, 1f);
 			var range = Random.Range(0, 360);
 			_CachedTransform.eulerAngles = new Vector3(range, range, 0);
-
-			if (Animator._spriteRenderer != null)
-			{
-                Animator._spriteRenderer.color = Color.black;
-
-            }
-        }
+		}
 
 		public void PlayAnimation(ModelNode p_node)
 		{
@@ -59,8 +53,7 @@ namespace Nekki.Vector.Core.Location
 			_isRender = true;
 			_node = new ModelNode(new Vector3d());
 			_node.Attenuation = 0;
-			_node.Radius = 10;
-			_node.PositionStart(Position.X + _Width * 0.5, Position.Y + _Height * 0.5, 0);
+			_node.PositionStart((Position.X + _Width * 0.5), (Position.Y + _Height * 0.5), 0);
 			_node.EndAssignStart();
 			MoveParticle();
 			SetImpuls(p_node);
@@ -102,9 +95,8 @@ namespace Nekki.Vector.Core.Location
 			}
 			base.Render();
 			_node.TimeStep(ControllerPhysics.Gravity);
-            ControllerCollisions.PushingNode(_node, BaseSets.Current.Quads, 0.5);
 			MoveParticle();
-            IsCollision();
+			IsCollision();
 			return false;
 		}
 
@@ -128,10 +120,6 @@ namespace Nekki.Vector.Core.Location
 			IsEnabled = false;
 			_IsPlay = false;
 			_isRender = false;
-			
-			_CachedTransform.localScale *= Random.Range(0.5f, 1f);
-			var range = Random.Range(0, 360);
-			_CachedTransform.eulerAngles = new Vector3(range, range, 0);
 		}
 	}
 }

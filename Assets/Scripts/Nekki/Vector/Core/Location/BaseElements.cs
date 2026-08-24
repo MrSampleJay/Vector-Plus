@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Nekki.Vector.Core.Location.Animation;
 using Nekki.Vector.Core.Location.LevelCreation;
 using UnityEngine;
@@ -30,6 +31,8 @@ namespace Nekki.Vector.Core.Location
         protected List<SpawnRunner> _Spawns = new List<SpawnRunner>();
 
         protected List<CameraRunner> _Cameras = new List<CameraRunner>();
+
+        protected List<SoundSourceRunner> _SoundSources = new List<SoundSourceRunner>();
 
         protected List<PrimitiveRunner> _Primitives = new List<PrimitiveRunner>();
 

@@ -1,7 +1,10 @@
-using System.Collections.Generic;
+using Codice.Client.BaseCommands;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Node;
 using Nekki.Vector.Core.Trigger.Events;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Nekki.Vector.Core.Models
 {
@@ -122,7 +125,25 @@ namespace Nekki.Vector.Core.Models
 
         private bool CheckAI(TriggerRunner p_triger)
         {
-            return _Model.AI == p_triger.AIVar.ValueInt || p_triger.AIVar.ValueInt == -1;
+            switch (p_triger.AIType)
+            {
+                case TriggerRunner.TriggerAIType.OneAI:
+                    return _Model.AI == p_triger.AIVar.ValueInt || p_triger.AIVar.ValueInt == -1;
+                case TriggerRunner.TriggerAIType.MultiAI:
+                    {
+                        for (int i = 0; i < p_triger.TriggerAIs.Length; i++)
+                        {
+                            if (_Model.AI == p_triger.TriggerAIs[i])
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                default:
+                    return false;
+            }
+            
         }
 
         public bool GetInside(TriggerRunner p_trigger)
@@ -130,14 +151,14 @@ namespace Nekki.Vector.Core.Models
             switch (p_trigger.CollisionType)
             {
                 case TriggerRunner.TriggerColisionType.OneNode:
-                    return p_trigger.Hit(GetNode(p_trigger).Start);
+                    return p_trigger.TriggerHit(GetNode(p_trigger));
                 case TriggerRunner.TriggerColisionType.MultiNode:
                     {
                         string text = null;
                         for (int i = 0; i < p_trigger.TriggerNodesName.Count; i++)
                         {
-                            text = p_trigger.CollisionNodeName = p_trigger.TriggerNodesName[i];
-                            if (p_trigger.Hit(GetNode(text).Start))
+                            text = (p_trigger.CollisionNodeName = p_trigger.TriggerNodesName[i]);
+                            if (p_trigger.TriggerHit(GetNode(text)))
                             {
                                 return true;
                             }

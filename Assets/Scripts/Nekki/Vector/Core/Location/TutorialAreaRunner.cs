@@ -46,8 +46,8 @@ namespace Nekki.Vector.Core.Location
 			}
 		}
 
-		public TutorialAreaRunner(float x, float y, float width, float height, string typeName, string name, string key, string description)
-			: base(AreaType.Help, x, y, width, height, typeName, name)
+		public TutorialAreaRunner(float x, float y, float width, float height, string typeName, string name, string key, string description, int direction = 0)
+			: base(AreaType.Help, x, y, width, height, typeName, name, direction)
 		{
 			_key = key;
 			Key = new KeyVariables(key);

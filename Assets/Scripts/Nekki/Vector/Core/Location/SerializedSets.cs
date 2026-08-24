@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Xml;
 using Nekki.Vector.Core.Visual;
@@ -9,7 +10,7 @@ namespace Nekki.Vector.Core.Location
     {
         private readonly Xml2PrefabLevelContainer _model;
 
-        public SerializedSets(Xml2PrefabLevelContainer model)
+        public SerializedSets(Xml2PrefabLevelContainer model) : base()
         {
             _model = model;
             ParseLevel();
@@ -19,7 +20,7 @@ namespace Nekki.Vector.Core.Location
         {
             ParseChoices(_model.Choices);
             TotalCoins = _model.Coins;
-            var nodes = _model.Models.Select<string, XmlNode>(xmlString =>
+            var nodes = _model.Models.Select<string, XmlNode>((xmlString) =>
             {
                 return XmlUtils.OpenXMLElementFromString(xmlString);
             });

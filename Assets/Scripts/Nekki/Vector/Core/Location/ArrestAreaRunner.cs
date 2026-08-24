@@ -1,6 +1,7 @@
-using System.Collections.Generic;
 using Nekki.Vector.Core.Camera;
 using Nekki.Vector.Core.Models;
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Nekki.Vector.Core.Location
@@ -19,8 +20,8 @@ namespace Nekki.Vector.Core.Location
 
         public bool IsArrest => _IsArrest;
 
-        public ArrestAreaRunner(float x, float y, float width, float height, string typeName, string name, float distance)
-            : base(AreaType.Catch, x, y, width, height, typeName, name)
+        public ArrestAreaRunner(float x, float y, float width, float height, string typeName, string name, float distance, int direction = 0)
+            : base(AreaType.Catch, x, y, width, height, typeName, name, direction)
         {
             _IsEnabled = true;
             _Distance = distance;

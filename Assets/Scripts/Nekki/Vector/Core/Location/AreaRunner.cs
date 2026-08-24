@@ -30,6 +30,8 @@ namespace Nekki.Vector.Core.Location
 
         protected string _TypeName;
 
+        public int _Direction;
+
         public bool IsNone => _Type == AreaType.None;
 
         public bool IsHelp => _Type == AreaType.Help;
@@ -38,7 +40,7 @@ namespace Nekki.Vector.Core.Location
 
         public bool IsCatch => _Type == AreaType.Catch;
 
-        public AreaRunner(AreaType type, float x, float y, float width, float height, string typeName, string name)
+        public AreaRunner(AreaType type, float x, float y, float width, float height, string typeName, string name, int direction = 0)
             : base(x, y, width, height, sticky: false, string.IsNullOrEmpty(typeName) ? 1 : 0, name)
         {
             _Type = type;
@@ -47,7 +49,9 @@ namespace Nekki.Vector.Core.Location
             _Y = y;
             _W = width;
             _H = height;
+            _Direction = direction; 
             _TypeClass = RunnerType.Area;
+
             LoadBinaryIfTrick();
         }
 

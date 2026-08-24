@@ -1,6 +1,10 @@
-using System.Xml;
 using Nekki.Vector.Core.Camera;
 using Nekki.Vector.Core.Models;
+using System.Collections.Generic;
+using System;
+using System.Runtime.CompilerServices;
+using System.Xml;
+using UnityEngine;
 
 namespace Nekki.Vector.Core.Trigger.Actions
 {
@@ -16,9 +20,15 @@ namespace Nekki.Vector.Core.Trigger.Actions
 
 		private Variable _FramesVar;
 
+        private Variable _ZoomFramesVar;
+
 		private Variable _IsStopVar;
 
-		private TA_Camera(TA_Camera p_copyAction)
+        private Variable _StopPosX;
+
+        private Variable _StopPosY;
+
+        private TA_Camera(TA_Camera p_copyAction)
 			: base(p_copyAction._ParentLoop)
 		{
             _FollowVar = p_copyAction._FollowVar;
@@ -31,34 +41,27 @@ namespace Nekki.Vector.Core.Trigger.Actions
 		public TA_Camera(XmlNode p_node, TriggerLoop p_parent)
 			: base(p_parent)
 		{
-            XmlAttribute xmlAttribute = p_node.Attributes["Zoom"];
-            XmlAttribute xmlAttribute2 = p_node.Attributes["Smoothness"];
-            XmlAttribute xmlAttribute3 = p_node.Attributes["Frames"];
-            XmlAttribute xmlAttribute4 = p_node.Attributes["Follow"];
-            XmlAttribute xmlAttribute5 = p_node.Attributes["Stop"];
-            if (xmlAttribute != null)
+            var attributeMap = new Dictionary<string, Action<string>>
             {
-                InitActionVar(p_parent.ParentTrigger, ref _ZoomVar, xmlAttribute.Value);
-            }
-            if (xmlAttribute2 != null)
+                ["Zoom"] = v => InitActionVar(p_parent.ParentTrigger, ref _ZoomVar, v),
+                ["Smoothness"] = v => InitActionVar(p_parent.ParentTrigger, ref _SmoothnessVar, v),
+                ["Frames"] = v => InitActionVar(p_parent.ParentTrigger, ref _FramesVar, v),
+                ["Follow"] = v => InitActionVar(p_parent.ParentTrigger, ref _FollowVar, v),
+                ["Stop"] = v => InitActionVar(p_parent.ParentTrigger, ref _IsStopVar, v),
+                ["ZoomFrames"] = v => InitActionVar(p_parent.ParentTrigger, ref _ZoomFramesVar, v),
+                ["StopX"] = v => InitActionVar(p_parent.ParentTrigger, ref _StopPosX, v),
+                ["StopY"] = v => InitActionVar(p_parent.ParentTrigger, ref _StopPosY, v),
+            };
+
+            foreach (var entry in attributeMap)
             {
-                InitActionVar(p_parent.ParentTrigger, ref _SmoothnessVar, xmlAttribute2.Value);
-            }
-            if (xmlAttribute3 != null)
-            {
-                InitActionVar(p_parent.ParentTrigger, ref _FramesVar, xmlAttribute3.Value);
-            }
-            if (xmlAttribute4 != null)
-            {
-                InitActionVar(p_parent.ParentTrigger, ref _FollowVar, xmlAttribute4.Value);
-            }
-            if (xmlAttribute5 != null)
-            {
-                InitActionVar(p_parent.ParentTrigger, ref _IsStopVar, xmlAttribute5.Value);
+                var attr = p_node.Attributes[entry.Key];
+                if (attr != null)
+                    entry.Value(attr.Value);
             }
         }
 
-		public override void Activate(ref bool p_isRunNext)
+        public override void Activate(ref bool p_isRunNext)
 		{
             p_isRunNext = true;
             if (_FollowVar != null)
@@ -88,20 +91,39 @@ namespace Nekki.Vector.Core.Trigger.Actions
             }
             if (_ZoomVar != null)
             {
+                int frames = 30;
+                if (_ZoomFramesVar != null)
+                {
+                   frames = _ZoomFramesVar.ValueInt == 0 ? 1 : _ZoomFramesVar.ValueInt;
+                }
                 float currentZoom = LocationCamera.CurrentZoom;
                 switch (_ZoomVar.Type)
                 {
                     case VariableTypeE.VT_INT:
-                        LocationCamera.Current.Zooming(_ZoomVar.ValueInt * currentZoom);
+                        LocationCamera.Current.Zooming((float)_ZoomVar.ValueInt * currentZoom, false, frames);
                         break;
                     case VariableTypeE.VT_DOUBLE:
-                        LocationCamera.Current.Zooming(_ZoomVar.ValueFloat * currentZoom);
+                        LocationCamera.Current.Zooming(_ZoomVar.ValueFloat * currentZoom, false, frames);
                         break;
                 }
             }
             if (_IsStopVar != null)
             {
                 LocationCamera.Current.Stop();
+            }
+            if (_StopPosX != null || _StopPosY != null)
+            {
+                float? X = null;
+                float? Y = null;
+                if (_StopPosX != null)
+                {
+                    X = _StopPosX.ValueFloat;
+                }
+                if (_StopPosY != null)
+                {
+                    Y = _StopPosY.ValueFloat;
+                }
+                LocationCamera.Current.Stop(X,Y);
             }
             if (_FramesVar != null)
             {

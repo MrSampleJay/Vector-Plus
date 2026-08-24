@@ -1,4 +1,6 @@
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using Nekki.Vector.Core.Animation.Events;
 using Nekki.Vector.Core.Detector;
@@ -223,7 +225,13 @@ namespace Nekki.Vector.Core.Animation
                             break;
                         }
                     case "OnFrame":
-                        FrameEvents.Add(new AnimationEventFrame(item.Attributes["Frame"].ParseInt(), GetEventParam(item)));
+						string[] array = item.Attributes["Frame"].Value.Split('|');
+						int[] newarray = new int[array.Length];
+						for (int ii = 0; ii < array.Length; ii++)
+						{
+							newarray[ii] = int.Parse(array[ii]);
+                            FrameEvents.Add(new AnimationEventFrame(newarray[ii], GetEventParam(item)));
+                        }
                         break;
                     case "OnTrigger":
 					case "OnArea":
@@ -258,7 +266,17 @@ namespace Nekki.Vector.Core.Animation
             {
                 if (childNode.Name == "Sound")
                 {
-                    list2.Add(new AnimationSound(childNode.Attributes["Name"].Value, childNode.Attributes["Type"].ParseInt(0)));
+                    if (childNode.Attributes["Group"] != null)
+                    {
+                        string soundgroupname = childNode.Attributes["Group"].Value;
+                        AnimationSoundGroup group = AnimationSoundGroup.GetGroup(soundgroupname);
+                        list2.AddRange(group.Sounds);
+                    }
+					else
+					{
+                        AnimationSound newSound = new AnimationSound(childNode.Attributes["Name"].Value, int.Parse(childNode.Attributes["Type"].Value), XmlUtils.ParseString(childNode.Attributes["Voice"], null));
+                        list2.Add(newSound);
+                    }
                 }
             }
             if (list2.Count == 0)

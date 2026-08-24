@@ -1,12 +1,14 @@
+using Codice.Client.BaseCommands;
+using Nekki.Vector.Core.Location.Animation;
+using Nekki.Vector.Core.Location.LevelCreation;
+using Nekki.Vector.Core.Utilites;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using Nekki.Vector.Core.Location.Animation;
-using Nekki.Vector.Core.Location.LevelCreation;
-using Nekki.Vector.Core.Models;
-using Nekki.Vector.Core.Utilites;
+using System.Xml.Linq;
 using UnityEngine;
 using Xml2Prefab;
+
 
 namespace Nekki.Vector.Core.Location
 {
@@ -22,7 +24,7 @@ namespace Nekki.Vector.Core.Location
         {
             if (mainNode == null)
             {
-                return 0;
+                return Index;
             }
             uint num = 0;
             for (int i = 0; i < mainNode.ChildNodes.Count; i++)
@@ -109,6 +111,12 @@ namespace Nekki.Vector.Core.Location
                         if (runner != null)
                         {
                             _Particles.Add((ParticleRunner)runner);
+                        break;
+                    case "SoundSource":
+                        runner = CreateSoundsource(node);
+                        if (runner != null)
+                        {
+                            _SoundSources.Add((SoundSourceRunner)runner);
                             num++;
                         }
                         break;
@@ -116,6 +124,7 @@ namespace Nekki.Vector.Core.Location
 
                 if (runner != null)
                 {
+                    num++;
                     runner.SetVariant(choice);
                     _runners.Add(runner);
                     runner.Generate();
@@ -126,7 +135,19 @@ namespace Nekki.Vector.Core.Location
             Init();
             return num;
         }
-
+        private SoundSourceRunner CreateSoundsource(XmlNode Node)
+        {
+            if (Node == null)
+            {
+                return null;
+            }
+            float p_x = XmlUtils.ParseFloat(Node.Attributes["X"]);
+            float p_y = XmlUtils.ParseFloat(Node.Attributes["Y"]);
+            SoundSourceRunner soundSourceRunner = new SoundSourceRunner(p_x, p_y, Node);
+            soundSourceRunner.Layer = _Parent.Layer;
+            soundSourceRunner.SetXmlList(Xml2PrefabUtils.GetTransformationNode(Node));
+            return soundSourceRunner;
+        }
         private TriggerRunner CreateTrigger(XmlNode Node)
         {
             var x = Node.Attributes["X"].ParseFloat();
@@ -151,21 +172,21 @@ namespace Nekki.Vector.Core.Location
             switch (type)
             {
                 case "Trick":
-                    string itemName = node.Attributes["ItemName"].ParseString();
-                    int score = node.Attributes["Score"].ParseInt();
-                    area = new TrickAreaRunner(x, y, width, height, type, name, itemName, score);
+                    string itemName = XmlUtils.ParseString(node.Attributes["ItemName"]);
+                    int score = XmlUtils.ParseInt(node.Attributes["Score"]);
+                    area = new TrickAreaRunner(x, y, width, height, type, name, itemName, score, direction);
                     break;
                 case "Catch":
                     float distance = node.Attributes["Distance"].ParseFloat(200);
                     area = new ArrestAreaRunner(x, y, width, height, type, name, distance);
                     break;
                 case "Help":
-                    string key = node.Attributes["Key"].ParseString();
-                    string description = node.Attributes["Description"].ParseString();
-                    area = new TutorialAreaRunner(x, y, width, height, type, name, key, description);
+                    string key = XmlUtils.ParseString(node.Attributes["Key"]);
+                    string description = XmlUtils.ParseString(node.Attributes["Description"]);
+                    area = new TutorialAreaRunner(x, y, width, height, type, name, key, description, direction);
                     break;
                 default:
-                    area = new AreaRunner(AreaRunner.AreaType.None, x, y, width, height, type, name);
+                    area = new AreaRunner(AreaRunner.AreaType.None, x, y, width, height, type, name, direction);
                     break;
             }
             area.Layer = _Parent.Layer;
@@ -195,7 +216,7 @@ namespace Nekki.Vector.Core.Location
             {
                 color = ColorUtils.FromHex(node["Properties"]["Static"]["StartColor"].Attributes["Color"].Value);
             }
-            int depth = node.Attributes["Depth"].ParseInt(-1);
+            float depth = XmlUtils.ParseFloat(node.Attributes["Depth"], 0.5f);
             XmlNode matrixNode = null;
             if (node["Properties"] != null && node["Properties"]["Static"] != null && node["Properties"]["Static"]["Matrix"] != null)
             {

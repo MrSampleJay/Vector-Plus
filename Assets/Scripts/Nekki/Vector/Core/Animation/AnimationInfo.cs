@@ -1,7 +1,9 @@
-using System.Collections.Generic;
-using System.Xml;
 using Core._Common;
 using Nekki.Vector.Core.Frame;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xml;
+using UnityEditor;
 
 namespace Nekki.Vector.Core.Animation
 {
@@ -63,6 +65,8 @@ namespace Nekki.Vector.Core.Animation
             get;
             private set;
         }
+
+        public string Folder;
 
         public int FirstFrame
         {
@@ -152,43 +156,41 @@ namespace Nekki.Vector.Core.Animation
             set => _Loop = value;
         }
 
-        public AnimationInfo(XmlNode node)
+        public AnimationInfo(XmlNode node, string Path = null)
         {
-            Velocity = new Vector3f();
-            Gravity = new Vector3f();
+            Velocity = new Vector3f(0, 0, 0);
+            Gravity = new Vector3f(0, 0, 0);
 
-
-
-            _isPart = node.Attributes["Part"].ParseBool();
+            _isPart = XmlUtils.ParseBool(node.Attributes["Part"]);
             Name = node.Name;
-            _Id = node.Attributes["ID"].ParseInt();
-            FileName = node.Attributes["FileName"].ParseString();
-            FirstFrame = node.Attributes["FirstFrame"].ParseInt();
-            MidFrames = node.Attributes["MidFrames"].ParseInt(2);
-            _endFrame = node.Attributes["EndFrame"].ParseInt();
+            _Id = XmlUtils.ParseInt(node.Attributes["ID"]);
+            FileName = XmlUtils.ParseString(node.Attributes["FileName"]);
+            Folder = XmlUtils.ParseString(node.Attributes["Folder"], "Data");
+            FirstFrame = XmlUtils.ParseInt(node.Attributes["FirstFrame"]);
+            MidFrames = XmlUtils.ParseInt(node.Attributes["MidFrames"], 2);
+            _endFrame = XmlUtils.ParseInt(node.Attributes["EndFrame"]);
             PivotNode = node.Attributes["PivotNode"].Value;
-            Type = node.Attributes["Type"].ParseInt(1);
-            SubType = node.Attributes["SubType"].ParseInt();
-            Priority = node.Attributes["Priority"].ParseInt(1);
-            Binding = node.Attributes["Binding"].ParseBool();
-            DeltaDetectorH = node.Attributes["DeltaDetectorH"].ParseFloat();
-            DeltaDetectorV = node.Attributes["DeltaDetectorV"].ParseFloat();
-            Mirror = node.Attributes["Mirror"].ParseBool(true);
-            var x = node.Attributes["VelocityX"].ParseFloat();
-            var y = node.Attributes["VelocityY"].ParseFloat();
+            Type = XmlUtils.ParseInt(node.Attributes["Type"], 1);
+            SubType = XmlUtils.ParseInt(node.Attributes["SubType"]);
+            Priority = XmlUtils.ParseInt(node.Attributes["Priority"], 1);
+            Binding = XmlUtils.ParseBool(node.Attributes["Binding"]);
+            DeltaDetectorH = XmlUtils.ParseFloat(node.Attributes["DeltaDetectorH"]);
+            DeltaDetectorV = XmlUtils.ParseFloat(node.Attributes["DeltaDetectorV"]);
+            Mirror = XmlUtils.ParseBool(node.Attributes["Mirror"], true);
+            var x = XmlUtils.ParseFloat(node.Attributes["VelocityX"]);
+            var y = XmlUtils.ParseFloat(node.Attributes["VelocityY"]);
             Velocity = new Vector3f(x, y);
-            Gravity = new Vector3f(0, node.Attributes["Gravity"].ParseFloat());
-            AutoPositionDetectorH = node.Attributes["AutoPositionDetectorH"].ParseFloat(-1);
-            AutoPositionDetectorV = node.Attributes["AutoPositionDetectorV"].ParseFloat(-1);
-            LandingPositionDetectorH = node.Attributes["LandingPositionDetectorH"].ParseFloat(-1);
-            LandingPositionDetectorV = node.Attributes["LandingPositionDetectorV"].ParseFloat(-1);
-            PlatformAnticipationFrames = (int)node.Attributes["PlatformAnticipationFrames"].ParseFloat();
-
+            Gravity = new Vector3f(0, XmlUtils.ParseFloat(node.Attributes["Gravity"]));
+            AutoPositionDetectorH = XmlUtils.ParseFloat(node.Attributes["AutoPositionDetectorH"], -1);
+            AutoPositionDetectorV = XmlUtils.ParseFloat(node.Attributes["AutoPositionDetectorV"], -1);
+            LandingPositionDetectorH = XmlUtils.ParseFloat(node.Attributes["LandingPositionDetectorH"], -1);
+            LandingPositionDetectorV = XmlUtils.ParseFloat(node.Attributes["LandingPositionDetectorV"], -1);
+            PlatformAnticipationFrames = (int)XmlUtils.ParseFloat(node.Attributes["PlatformAnticipationFrames"]);
         }
 
         public void LoadBin()
         {
-            FileName = VectorPaths.AnimationBinary + "/" + FileName;
+            FileName = VectorPaths.Animations + "/" + Folder + "/" + FileName;
             if (!_isPart && !IsTrick)
             {
                 LoadBinary(true);
@@ -221,7 +223,7 @@ namespace Nekki.Vector.Core.Animation
 
         public void CloneFrames(int pStart, int end, KeyFrames frames, int nodesCount)
         {
-			int p_to = end <= 0 || end > _frames.Length - 1 ? _frames.Length - 1 : end;
+			int p_to = ((end <= 0 || end > _frames.Length - 1) ? (_frames.Length - 1) : end);
 			frames.SetFrames(pStart, p_to, _frames.Data);
         }
     }

@@ -144,7 +144,15 @@ namespace Nekki.Vector.Core.Camera
             _Node = new CameraNode(new ModelNode(p_position));
         }
 
-		public void Layers(BaseSets p_sets)
+		public void Stop(float? XPos = null, float? YPos = null)
+        {
+			float X = XPos ?? (float)(_Node.Start.X + (_Node.Start.X - _Node.End.X) * 20f);
+            float Y = YPos ?? (float)(_Node.Start.Y + (_Node.Start.Y - _Node.End.Y) * 20f);
+            Vector3d p_position = new Vector3d(X, Y);
+            _Node = new CameraNode(new ModelNode(p_position));
+        }
+
+        public void Layers(BaseSets p_sets)
 		{
 			foreach (var container in p_sets.Containers.Values)
 			{
@@ -155,9 +163,9 @@ namespace Nekki.Vector.Core.Camera
 			}
 		}
 
-		public void Zooming(float p_value = 1f, bool p_isStart = false)
+		public void Zooming(float p_value = 1f, bool p_isStart = false, int frames = 30)
 		{
-            if (_Zoom != p_value && !_IgnoreZoom)
+            if (_Zoom != p_value && _IgnoreZoom == false)
             {
                 if (p_value < MinZoom)
                 {
@@ -170,7 +178,7 @@ namespace Nekki.Vector.Core.Camera
                 _Zoom = p_value;
                 foreach (var container in _Containers)
                 {
-                    container.Zooming(p_value, p_isStart);
+                    container.Zooming(p_value, p_isStart, frames);
                 }
             }
         }

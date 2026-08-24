@@ -1,9 +1,10 @@
-using System.Collections.Generic;
-using System.Xml;
 using Nekki.Vector.Core.Location.Animation;
 using Nekki.Vector.Core.Location.LevelCreation;
 using Nekki.Vector.Core.User;
 using Nekki.Vector.Core.Visual;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 using Xml2Prefab;
 
 namespace Nekki.Vector.Core.Location
@@ -81,60 +82,11 @@ namespace Nekki.Vector.Core.Location
             }
         }
 
-        public int totalPoints
-        {
-            get
-            {
-                int points = 0;
-                foreach (var area in Areas)
-                {
-                    if (area is TrickAreaRunner trick)
-                    {
-                        points += trick.score;
-                    }
-                }
-                foreach (var item in Items)
-                {
-                    if (item is ItemScoreRunner scoreRunner)
-                    {
-                        points += scoreRunner.score;
-                    }
-                }
-                return points;
-            }
-        }
+        public int totalPoints;
 
-        public int totalTricks
-        {
-            get
-            {
-                int index = 0;
-                foreach (var area in Areas)
-                {
-                    if (area is TrickAreaRunner)
-                    {
-                        index++;
-                    }
-                }
-                return index;
-            }
-        }
+        public int totalTricks;
 
-        public int totalBonus
-        {
-            get
-            {
-                int index = 0;
-                foreach (var item in Items)
-                {
-                    if (item.Type == 0)
-                    {
-                        index++;
-                    }
-                }
-                return index;
-            }
-        }
+        public int totalBonus;
 
         protected BaseSets()
         {
@@ -272,6 +224,16 @@ namespace Nekki.Vector.Core.Location
             }
         }
 
+        public void SetTotals()
+        {
+            totalBonus = Items.Count(o => o.Type == 0);
+            totalTricks = Areas.Count(t => t is TrickAreaRunner);
+            int points = 0;
+            points += Areas.OfType<TrickAreaRunner>().Sum(i => i.score);
+            points += Items.OfType<ItemScoreRunner>().Sum(l => l.score);
+
+            totalPoints = points;
+        }
         public void Add(BaseElements elements)
         {
             Visuals.AddRange(elements.Visuals);

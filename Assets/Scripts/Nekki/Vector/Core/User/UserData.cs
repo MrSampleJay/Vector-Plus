@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Nekki.Vector.Core.Animation;
+using System.Collections.Generic;
 using UnityEngine;
 using AnimationInfo = Nekki.Vector.Core.Animation.AnimationInfo;
 
@@ -49,7 +49,9 @@ namespace Nekki.Vector.Core.User
 
 		private bool _isIcon;
 
-		public string UserId => _UserId;
+        private string _Voice;
+
+        public string UserId => _UserId;
 
 		public Color Color
 		{
@@ -161,7 +163,19 @@ namespace Nekki.Vector.Core.User
 			set => _isIcon = value;
 		}
 
-		public UserData(string userID)
+        public string Voice
+        {
+            get
+            {
+                return _Voice;
+            }
+            set
+            {
+                _Voice = value;
+            }
+        }
+
+        public UserData(string userID)
 		{
 			_UserId = userID;
 		}

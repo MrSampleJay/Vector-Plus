@@ -6,6 +6,8 @@ namespace Nekki.Vector.Core.Location
 	{
 		private new string _Name;
 
+		private string _Material;
+
 		private float _X;
 
 		private float _Y;

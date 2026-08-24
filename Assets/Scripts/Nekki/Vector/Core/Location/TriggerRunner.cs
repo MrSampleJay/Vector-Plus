@@ -1,8 +1,10 @@
-using System.Collections.Generic;
-using System.Xml;
 using Nekki.Vector.Core.Models;
+using Nekki.Vector.Core.Node;
 using Nekki.Vector.Core.Trigger;
 using Nekki.Vector.Core.Trigger.Events;
+using System.Collections;
+using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using Xml2Prefab;
 
@@ -14,6 +16,20 @@ namespace Nekki.Vector.Core.Location
         {
             OneNode = 0,
             MultiNode = 1
+        }
+
+        public enum TriggerAIType
+        {
+            OneAI = 0,
+            MultiAI = 1
+        }
+        private enum TriggerType
+        {
+            TT_Rectangle = 0,
+            TT_Elips = 1,
+            TT_UpDiagonal = 2,
+            TT_DownDiagonal = 3,
+            TT_Circle = 4
         }
 
         private TriggerTimer _timer;
@@ -52,15 +68,81 @@ namespace Nekki.Vector.Core.Location
 
         public List<string> _NodesName;
 
+        public int[] _MultiAI;
+
         private TriggerColisionType _CollisionType = TriggerColisionType.OneNode;
+
+        private TriggerAIType _AIType = TriggerAIType.OneAI;
+
+        private TriggerType _TriggerType;
 
         public string CollisionNodeName
         {
-            get => _CollisionNodeName;
-            set => _CollisionNodeName = value;
+            get
+            {
+                return _CollisionNodeName;
+            }
+            set
+            {
+                _CollisionNodeName = value;
+            }
         }
 
-        public List<string> TriggerNodesName => _NodesName;
+        public List<string> TriggerNodesName
+        {
+            get
+            {
+                return _NodesName;
+            }
+        }
+
+        public int[] TriggerAIs
+        {
+            get
+            {
+                return _MultiAI;
+            }
+        }
+
+        public bool IsRectType
+        {
+            get
+            {
+                return _TriggerType == TriggerType.TT_Rectangle;
+            }
+        }
+
+        public bool IsElipsType
+        {
+            get
+            {
+                return _TriggerType == TriggerType.TT_Elips;
+            }
+        }
+
+        public bool IsUpDiagonal
+        {
+            get
+            {
+                return _TriggerType == TriggerType.TT_UpDiagonal;
+            }
+        }
+
+        public bool IsDownDiagonal
+        {
+            get
+            {
+                return _TriggerType == TriggerType.TT_DownDiagonal;
+            }
+        }
+
+        public bool IsDiagonal
+        {
+            get
+            {
+                return IsUpDiagonal || IsDownDiagonal;
+            }
+        }
 
         public List<TriggerLine> Lines => _lines;
 
@@ -76,15 +158,18 @@ namespace Nekki.Vector.Core.Location
 
         public TriggerColisionType CollisionType => _CollisionType;
 
+        public TriggerAIType AIType => _AIType;
+
         public TriggerRunner(float p_x, float p_y, float p_width, float p_height, XmlNode p_node)
-            : base(p_x, p_y, p_width, p_height, sticky: false, 0, p_node.Attributes["Name"].ParseString(string.Empty))
+            : base(p_x, p_y, p_width, p_height, sticky: false, 0, XmlUtils.ParseString(p_node.Attributes["Name"], string.Empty))
         {
             _TypeClass = RunnerType.Trigger;
             _timer = new TriggerTimer(this);
             _w = p_width;
             _h = p_height;
             _xmlNode = p_node["Content"];
-            _statistic = p_node.Attributes["Statistic"].ParseString();
+            _TriggerType = GetTriggerType(XmlUtils.ParseString(p_node.Attributes["Type"], "Rectangle"));
+            _statistic = XmlUtils.ParseString(p_node.Attributes["Statistic"]);
             _rawNode = p_node;
         }
 
@@ -92,6 +177,7 @@ namespace Nekki.Vector.Core.Location
         {
             parseVariable(_xmlNode["Init"]);
             SetTriggerCollisionType();
+            // SetTriggerAIType();
             XmlNode xmlNode = _xmlNode["Template"];
             if (xmlNode != null)
             {
@@ -102,6 +188,27 @@ namespace Nekki.Vector.Core.Location
             InitEvents();
         }
 
+        private void SetTriggerAIType()
+        {
+            string[] parts = _AIvar.ValueString.Split('|');
+            int[] array = new int[parts.Length];
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                array[i] = int.Parse(parts[i]);
+            }
+
+            if (array.Length == 1)
+            {
+                _AIType = TriggerAIType.OneAI;
+                _AIvar.setValue(array[0]); 
+            }
+            else
+            {
+                _AIType = TriggerAIType.MultiAI;
+                _MultiAI = array;
+            }
+        }
         private void SetTriggerCollisionType()
         {
             string[] array = _nodeVar.ValueString.Split('|');
@@ -117,12 +224,80 @@ namespace Nekki.Vector.Core.Location
             }
         }
 
+        private TriggerType GetTriggerType(string p_value)
+        {
+            switch (p_value)
+            {
+                case "Rectangle":
+                    return TriggerType.TT_Rectangle;
+                case "Ellipse":
+                    return TriggerType.TT_Elips;
+                case "UpDiagonal":
+                    return TriggerType.TT_UpDiagonal;
+                case "DownDiagonal":
+                    return TriggerType.TT_DownDiagonal;
+                case "Circle":
+                    return TriggerType.TT_Circle;
+                default:
+                    return TriggerType.TT_Rectangle;
+            }
+        }
+        public bool TriggerHit(ModelNode p_node, bool Equality = false)
+        {
+            switch (_TriggerType)
+            {
+                case TriggerType.TT_Elips:
+                    return HitElips(p_node.Start);
+                case TriggerType.TT_Rectangle:
+                    return base.Hit(p_node.Start, Equality);
+                case TriggerType.TT_UpDiagonal:
+                    return HitUpDiagonal(p_node);
+                case TriggerType.TT_DownDiagonal:
+                    return HitDownDiagonal(p_node);
+                case TriggerType.TT_Circle:
+                    return HitCircle(p_node.Start);
+                default:
+                    return false;
+            }
+        }
+
+        public bool HitElips(Vector3d p_point)
+        {
+            bool flag = rectangle.Size.Width >= rectangle.Size.Height;
+            float num = ((!flag) ? (rectangle.Size.Height / 2f) : (rectangle.Size.Width / 2f));
+            float num2 = ((!flag) ? (rectangle.Size.Width / 2f) : (rectangle.Size.Height / 2f));
+            float num3 = Mathf.Sqrt(1f - num2 * num2 / (num * num));
+            float num4 = num * num3;
+            float midX = rectangle.MidX;
+            float midY = rectangle.MidY;
+            Vector2 vector = ((!flag) ? new Vector2(midX, midY - num4) : new Vector2(midX - num4, midY));
+            Vector2 vector2 = ((!flag) ? new Vector2(midX, midY + num4) : new Vector2(midX + num4, midY));
+            float num5 = Mathf.Sqrt(Mathf.Pow(vector.x - (float)p_point.X, 2f) + Mathf.Pow(vector.y - (float)p_point.Y, 2f));
+            float num6 = Mathf.Sqrt(Mathf.Pow(vector2.x - (float)p_point.X, 2f) + Mathf.Pow(vector2.y - (float)p_point.Y, 2f));
+            if (num5 + num6 < 2f * num)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool HitUpDiagonal(ModelNode p_node)
+        {
+            return p_node.CroosLine(rectangle.BottomLeft, rectangle.TopRight);
+        }
+
+        private bool HitDownDiagonal(ModelNode p_node)
+        {
+            return p_node.CroosLine(rectangle.TopLeft, rectangle.BottomRight);
+        }
+
+        private bool HitCircle(Vector3d p_point)
+        {
+            float num = Mathf.Sqrt(Mathf.Pow(rectangle.MidX - (float)p_point.X, 2f) + Mathf.Pow(rectangle.MidY - (float)p_point.Y, 2f));
+            return num < rectangle.Size.Width / 2f;
+        }
         protected override void SerializeData()
         {
-            if (_UnityObject == null)
-            {
-                CreateObject();
-            }
             _UnityObject.AddComponent<Xml2PrefabTriggerContainer>().Init(_rawNode.OuterXml, _h, _w, Choice);
             _CachedTransform = _UnityObject.transform;
         }
@@ -149,11 +324,9 @@ namespace Nekki.Vector.Core.Location
         {
             if (_colider == null)
             {
-                CreateObject();
-                var controller = UnityObject.AddComponent<TriggerColider>();
-                controller.Init(rectangle);
-                controller.OnBecameVisibleAction.AddListener(OnBecameVisible);
-                controller.OnBecameUnvisibleAction.AddListener(OnBecameUnvisible);
+                var controller = UnityObject.GetComponent<TriggerController>();
+                controller.OnBecameVisibleEvent += OnBecameVisible;
+                controller.OnBecameInvisibleEvent += OnBecameUnvisible;
             }
         }
 
@@ -191,7 +364,7 @@ namespace Nekki.Vector.Core.Location
                     switch (vars["_" + text].Type)
                     {
                         case VariableTypeE.VT_INT:
-                            vars["_" + text].setValue(int.Parse(text2));
+                            vars["_" + text].setValue(int.Parse(text2.ToString()));
                             break;
                         case VariableTypeE.VT_DOUBLE:
                             vars["_" + text].setValue(float.Parse(text2));

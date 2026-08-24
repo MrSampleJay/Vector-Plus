@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using Nekki.Vector.Core.Controllers;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Node;
-using Nekki.Vector.Core.Scripts;
+using Nekki.Vector.Core.Result;
+using System.Collections.Generic;
 using UnityEngine;
 using Collision = Nekki.Vector.Core.Result.Collision;
 
@@ -117,6 +117,36 @@ namespace Nekki.Vector.Core.Models
             _controllerStrike.Striking(edge, point, impulse);
         }
 
+        public void ResetImpuls(float p_index)
+        {
+            foreach (ModelNode node in _ModelObject.Nodes)
+            {
+                node.End.X += (node.Start.X - node.End.X) * p_index;
+                node.End.Y += (node.Start.Y - node.End.Y) * p_index;
+                node.End.Z += (node.Start.Z - node.End.Z) * p_index;
+            }
+        }
+        public void Stricke(float p_impuls, float p_R, Vector3d p_center)
+        {
+            double num = p_impuls;
+            foreach (ModelNode node in _ModelObject.Nodes)
+            {
+                if (node.IsFixed)
+                {
+                    break;
+                }
+                num = p_impuls;
+                Vector3d a = new Vector3d(node.Start.X, node.Start.Y, 0f) - p_center;
+                num *= 1f - a.Length / p_R;
+                a.Normalize();
+                num *= 1f / node.Weight;
+                a.X *= num * -1f;
+                a.Y *= num * -1f;
+                double p_x = node.End.X + a.X;
+                double p_y = node.End.Y + a.Y;
+                node.End.Set(p_x, p_y, node.End.Z);
+            }
+        }
         public virtual void OnCollisionPlatform(ModelEvent<Collision> Event)
         {
         }

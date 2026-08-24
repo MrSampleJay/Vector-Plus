@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Models;
 using Nekki.Vector.Core.Node;
+using System.Collections.Generic;
 
 namespace Nekki.Vector.Core.Controllers
 {
@@ -33,6 +33,12 @@ namespace Nekki.Vector.Core.Controllers
 
         private void Activate(AreaRunner p_value)
 		{
+            ModelNode modelNode = _Model.GetNode("COM");
+            int modelDirection = ((modelNode.Start - modelNode.End).X > 0f) ? 1 : (-1);
+            if (p_value._Direction != 0 && p_value._Direction != modelDirection)
+            {
+                return;
+            }
             _ActiveAreas.Add(p_value);
             p_value.Activate(_Model);
             _Model.OnActiveArea(p_value);

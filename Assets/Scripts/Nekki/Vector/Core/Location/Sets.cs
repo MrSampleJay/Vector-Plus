@@ -105,7 +105,6 @@ namespace Nekki.Vector.Core.Location
                     if (obj.Attributes["Name"] != null)
                         _ObjectsNodes[obj.Attributes["Name"].Value] = obj;
                 }
-
             }
         }
 
@@ -136,6 +135,7 @@ namespace Nekki.Vector.Core.Location
             InitPrimitives();
             InitAreas();
             InitVisual();
+            SetTotals();
         }
 
         protected void ParseModels(XmlNode nodes)

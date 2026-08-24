@@ -30,8 +30,8 @@ namespace Nekki.Vector.Core.Location
 
         public int score => _score;
 
-        public TrickAreaRunner(float x, float y, float width, float height, string typeName, string name, string itemName, int score)
-            : base(AreaType.Trick, x, y, width, height, typeName, name)
+        public TrickAreaRunner(float x, float y, float width, float height, string typeName, string name, string itemName, int score, int direction = 0)
+            : base(AreaType.Trick, x, y, width, height, typeName, name, direction)
         {
             _itemName = itemName;
             _score = score;
