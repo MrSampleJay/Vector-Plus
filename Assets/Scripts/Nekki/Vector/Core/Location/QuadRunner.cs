@@ -103,7 +103,6 @@ namespace Nekki.Vector.Core.Location
             set;
         } = new Vector3f();
 
-        public QuadRunner(float x, float y, float width, float height, bool sticky, int type = 0, string name = "")
         public QuadRunner(float x, float y, float width, float height, bool sticky, int type = 0, string name = "", string material = "")
             : base(x, y)
         {
