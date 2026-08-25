@@ -33,7 +33,7 @@ namespace Nekki.Vector.Core.Location
 			_UnityObject.AddComponent<Xml2PrefabParticleContainer>().Init(_Name, _DefautPosition.X, _DefautPosition.Y, _Width, _Height, TransformationDataRaw, Choice);
 		}
 
-		public override void Init()
+		public override void Init(float pivotX = 0, float pivotY = 1)
 		{
 			if (_Name == "p_glass1_mini")
 			{

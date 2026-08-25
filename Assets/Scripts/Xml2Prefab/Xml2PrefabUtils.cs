@@ -47,6 +47,7 @@ namespace Xml2Prefab
             userData.AI = int.Parse(node.Attributes["AI"].Value);
             userData.StartTime = node.Attributes["Time"].ParseFloat();
             userData.LiveTime = node.Attributes["LifeTime"].ParseFloat(2);
+            userData.Voice = node.Attributes["Voice"].ParseString("");
             if (userData.Skins.Count == 0)
             {
                 userData.Skins.Add("1");

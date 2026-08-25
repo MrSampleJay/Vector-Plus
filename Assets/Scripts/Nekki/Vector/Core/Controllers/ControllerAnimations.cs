@@ -471,12 +471,15 @@ namespace Nekki.Vector.Core.Controllers
                 }
                 for (int i = 0; i < sounds.Count; i++)
                 {
-                    string voice = string.Empty;
-                    if (_Model is ModelHuman human)
+                    if (_Model is ModelHuman)
                     {
-                        voice = human.Voice;
+                        sounds[i].Play((ModelHuman)_Model, (float)num);
                     }
-                    sounds[i].Play((float)num, voice);
+                    else
+                    {
+                        sounds[i].Play((float)num);
+                    }
+                    
                 }
             }
         }

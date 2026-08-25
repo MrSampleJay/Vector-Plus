@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using Nekki.Vector.Core.Detector;
 using Nekki.Vector.Core.Result;
 using Math = Nekki.Vector.Core.Utilites.Math;
@@ -29,6 +30,8 @@ namespace Nekki.Vector.Core.Location
         private double _DefaultY;
 
         private bool _Sticky;
+
+        private string _Material;
 
         private List<Vector3d> _Points = new List<Vector3d>();
 
@@ -78,6 +81,12 @@ namespace Nekki.Vector.Core.Location
             set => _Sticky = value;
         }
 
+        public string Material
+        {
+            get => _Material;
+            set => _Material = value;
+        }
+
         public Vector3d Point1 => _Point1;
 
         public Vector3d Point2 => _Point2;
@@ -95,6 +104,7 @@ namespace Nekki.Vector.Core.Location
         } = new Vector3f();
 
         public QuadRunner(float x, float y, float width, float height, bool sticky, int type = 0, string name = "")
+        public QuadRunner(float x, float y, float width, float height, bool sticky, int type = 0, string name = "", string material = "")
             : base(x, y)
         {
             Position = new Vector3f(x, y);
@@ -108,6 +118,7 @@ namespace Nekki.Vector.Core.Location
             _Type = type;
             _Name = name;
             _Sticky = sticky;
+            _Material = material;
             if (!string.IsNullOrEmpty(name))
             {
                 _NameHash = _Name.GetHashCode();

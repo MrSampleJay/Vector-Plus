@@ -324,9 +324,11 @@ namespace Nekki.Vector.Core.Location
         {
             if (_colider == null)
             {
-                var controller = UnityObject.GetComponent<TriggerController>();
-                controller.OnBecameVisibleEvent += OnBecameVisible;
-                controller.OnBecameInvisibleEvent += OnBecameUnvisible;
+                CreateObject();
+                var controller = UnityObject.AddComponent<TriggerColider>();
+                controller.Init(rectangle);
+                controller.OnBecameVisibleAction.AddListener(OnBecameVisible);
+                controller.OnBecameUnvisibleAction.AddListener(OnBecameUnvisible);
             }
         }
 

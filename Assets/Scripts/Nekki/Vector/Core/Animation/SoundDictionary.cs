@@ -31,11 +31,10 @@ namespace Nekki.Vector.Core.Animation
                 {
                     VoiceSounds[(originalName, childNode.Attributes["Type"].Value)] = newName;
                 }
-                else
+                else if(childNode.Name == "Material")
                 {
                     MaterialSounds[(originalName, childNode.Attributes["Type"].Value)] = newName;
                 }
-                
             }
         }
 

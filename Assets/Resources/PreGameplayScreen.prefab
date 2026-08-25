@@ -7805,6 +7805,7 @@ MonoBehaviour:
   _contentWidth: 0
   _spacing: 0
   _duration: 0.5
+  _childOffset: 0
   _currentDragIndex: 0
   StartIndex: 5
   EndIndex: 20

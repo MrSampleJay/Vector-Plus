@@ -6,8 +6,6 @@ namespace Nekki.Vector.Core.Location
 	{
 		private new string _Name;
 
-		private string _Material;
-
 		private float _X;
 
 		private float _Y;
@@ -18,8 +16,8 @@ namespace Nekki.Vector.Core.Location
 
 		private bool _S;
 
-		public PlatformRunner(string Name, float X, float Y, float Width, float Height, bool p_Stikly)
-			: base(X, Y, Width, Height, p_Stikly, 0, Name)
+		public PlatformRunner(string Name, float X, float Y, float Width, float Height, bool p_Stikly, string p_material = "")
+			: base(X, Y, Width, Height, p_Stikly, 0, Name, p_material)
 		{
 			_Name = Name;
 			_X = X;

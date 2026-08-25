@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Utilites;
-using UnityEngine;
+using Color = UnityEngine.Color;
 
 namespace Nekki.Vector.Core.Transformation
 {

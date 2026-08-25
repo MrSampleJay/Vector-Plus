@@ -3,6 +3,7 @@ using System.Xml;
 using Nekki.Vector.Core.Transformation;
 using UnityEngine;
 using Xml2Prefab;
+using Color = UnityEngine.Color;
 
 namespace Nekki.Vector.Core.Location
 {

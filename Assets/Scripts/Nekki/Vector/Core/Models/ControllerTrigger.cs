@@ -1,10 +1,7 @@
-using Codice.Client.BaseCommands;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Node;
 using Nekki.Vector.Core.Trigger.Events;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace Nekki.Vector.Core.Models
 {

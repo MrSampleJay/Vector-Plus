@@ -1,13 +1,12 @@
-using Codice.Client.BaseCommands;
 using Nekki.Vector.Core.Location.Animation;
 using Nekki.Vector.Core.Location.LevelCreation;
 using Nekki.Vector.Core.Utilites;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using System.Xml.Linq;
 using UnityEngine;
 using Xml2Prefab;
+using Nekki.Vector.Core.Models;
 
 
 namespace Nekki.Vector.Core.Location
@@ -53,10 +52,7 @@ namespace Nekki.Vector.Core.Location
                     case "Image":
                         runner = CreateVisual(node);
                         if (runner != null)
-                        {
                             _Visuals.Add((VisualRunner)runner);
-                            num++;
-                        }
                         break;
                     case "Trigger":
                         runner = CreateTrigger(node);
@@ -101,26 +97,19 @@ namespace Nekki.Vector.Core.Location
                     case "Animation":
                         runner = CreateAnimation(node);
                         if (runner != null)
-                        {
                             _Animations.Add((AnimationRunner)runner);
-                            num++;
-                        }
                         break;
                     case "Particle":
                         runner = CreateParticle(node);
                         if (runner != null)
-                        {
                             _Particles.Add((ParticleRunner)runner);
                         break;
                     case "SoundSource":
                         runner = CreateSoundsource(node);
                         if (runner != null)
-                        {
                             _SoundSources.Add((SoundSourceRunner)runner);
-                            num++;
-                        }
                         break;
-                }
+                     }
 
                 if (runner != null)
                 {
@@ -169,6 +158,7 @@ namespace Nekki.Vector.Core.Location
             var y = node.Attributes["Y"].ParseFloat();
             var width = node.Attributes["Width"].ParseFloat();
             var height = node.Attributes["Height"].ParseFloat();
+            int direction = node.Attributes["Direction"].ParseInt(0); ;
             switch (type)
             {
                 case "Trick":
@@ -216,7 +206,7 @@ namespace Nekki.Vector.Core.Location
             {
                 color = ColorUtils.FromHex(node["Properties"]["Static"]["StartColor"].Attributes["Color"].Value);
             }
-            float depth = XmlUtils.ParseFloat(node.Attributes["Depth"], 0.5f);
+            int depth = XmlUtils.ParseInt(node.Attributes["Depth"], -1);
             XmlNode matrixNode = null;
             if (node["Properties"] != null && node["Properties"]["Static"] != null && node["Properties"]["Static"]["Matrix"] != null)
             {
@@ -240,7 +230,8 @@ namespace Nekki.Vector.Core.Location
             var width = node.Attributes["Width"].ParseFloat();
             var height = node.Attributes["Height"].ParseFloat();
             var sticky = node.Attributes["Sticky"].ParseBool(true);
-            var platform = new PlatformRunner(name, x, y, width, height, sticky);
+            var material = node.Attributes["Material"].ParseString("");
+            var platform = new PlatformRunner(name, x, y, width, height, sticky, material);
             platform.Layer = _Parent.Layer;
             platform.SetXmlList(Xml2PrefabUtils.GetTransformationNode(node));
             return platform;

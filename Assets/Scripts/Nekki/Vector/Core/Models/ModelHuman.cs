@@ -183,6 +183,8 @@ namespace Nekki.Vector.Core.Models
 
         public int PlatformAnticipationFrames => _controllerAnimations.Animation.PlatformAnticipationFrames;
 
+        public string Voice => _userData.Voice;
+
         public bool fixRectangle
         {
             set
