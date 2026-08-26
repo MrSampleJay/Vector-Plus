@@ -146,6 +146,7 @@ namespace Nekki.Vector.Core.Location
         public void AddMusics(XmlNode node)
         {
             _music = node.Attributes["Name"].Value;
+            _ReloadMusicOnReset = node.Attributes["ResetOnReload"].ParseBool(false);
         }
 
         public void CreateObjects()

@@ -23,6 +23,8 @@ namespace Nekki.Vector.Core.Location
 
         protected string _music;
 
+        protected bool _ReloadMusicOnReset;
+
         protected List<BaseObjectRunner> _Objects = new List<BaseObjectRunner>();
 
         public List<VisualRunner> Visuals = new List<VisualRunner>();
@@ -70,6 +72,8 @@ namespace Nekki.Vector.Core.Location
         public List<UserData> UserData => _UserData;
 
         public string Music => _music;
+
+        public bool ResetMusicOnReload => _ReloadMusicOnReset;
 
         public bool DebugMode
         {

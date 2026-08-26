@@ -36,6 +36,8 @@ namespace Nekki.Vector.Core.Location
 
         public string Music => Sets.Music;
 
+        public bool ResetMusicOnReload => Sets.ResetMusicOnReload;
+
         public List<UserData> UserData => Sets.UserData;
 
         public BaseSets Sets
