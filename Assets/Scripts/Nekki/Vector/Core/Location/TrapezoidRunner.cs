@@ -25,8 +25,8 @@ namespace Nekki.Vector.Core.Location
 
         private float _HeightQuad_R;
 
-        public TrapezoidRunner(string name, int type, float x, float y, float width, float height, float height1, bool stikly)
-            : base(x, y, width, height, stikly, type, name)
+        public TrapezoidRunner(string name, int type, float x, float y, float width, float height, float height1, bool stikly, string material = "")
+            : base(x, y, width, height, stikly, type, name, material)
         {
             _className = name;
             _type = type;

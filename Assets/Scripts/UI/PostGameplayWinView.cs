@@ -219,6 +219,7 @@ namespace UI
                 if (SelectLocationScreenView.IsItemLocked(UserDataManager.Instance, nextStory.UnlockInfo, nextStory.Name))
                 {
                     Game.Instance.ScreenManager.Show<SelectStoryScreen>(true, true);
+                    SoundsManager.Instance.PlayBackground(MusicType.menu);
                     return;
                 }
                 UserDataManager.RuntimeInfo.CurrentStory++;
@@ -230,7 +231,6 @@ namespace UI
             }
             SoundsManager.Instance.PlaySounds(SoundType.ui_click);
             SoundsManager.Instance.PlayBackground(MusicType.menu);
-            
         }
 
         public override void SetSelectedGO()

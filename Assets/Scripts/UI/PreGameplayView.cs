@@ -31,6 +31,12 @@ namespace UI
 
         public Text Title;
 
+        public Text LevelDescription;
+
+        public Text TrackDescription1;
+
+        public Text TrackDescription2;
+
         public ScrollSnap ScrollSnap;
 
         private bool _ShowBoostDialogRequestBeen;
@@ -115,6 +121,19 @@ namespace UI
             var playerData = UserDataManager.Instance;
             var storyInfo = playerData.CurrentBalanceLocation.CurrentStoryModeStoryInfos[UserDataManager.RuntimeInfo.CurrentStory];
             Title.text = LocalizationManager.Instance.GetTranslationByID(storyInfo.Name);
+            if(storyInfo.Description != null)
+            {
+                TrackDescription1.gameObject.SetActive(false);
+                TrackDescription2.gameObject.SetActive(false);
+                LevelDescription.text = LocalizationManager.Instance.GetTranslation(storyInfo.Description);
+                LevelDescription.gameObject.SetActive(true);
+            }
+            else
+            {
+                TrackDescription1.gameObject.SetActive(true);
+                TrackDescription2.gameObject.SetActive(true);
+                LevelDescription.gameObject.SetActive(false);
+            }
             GadgetIcon.SetActive(playerData.ShopData.IsEquipped("GADGET_FORCEBLASTER"));
             foreach (Transform child in ContentParent.transform)
             {

@@ -8,6 +8,12 @@ public class StoryInfo
 		private set;
 	}
 
+	public string Description 
+	{ 
+		get; 
+		private set; 
+	}
+
 	public StoryType Type
 	{
 		get;
@@ -44,9 +50,10 @@ public class StoryInfo
 		private set;
 	}
 
-	public StoryInfo(string id, StoryType storyType, List<string> trickIds, UnlockInfo unlockInfo, string rewardTemplate, string cutsceneStart, string cutsceneEnd)
+	public StoryInfo(string id, StoryType storyType, List<string> trickIds, UnlockInfo unlockInfo, string rewardTemplate, string cutsceneStart, string cutsceneEnd, string description)
 	{
 		Name = id;
+		Description = description;
 		Type = storyType;
 		TrickIds = trickIds;
 		UnlockInfo = unlockInfo;

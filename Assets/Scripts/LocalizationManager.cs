@@ -107,14 +107,18 @@ public class LocalizationManager : AbstractManager<LocalizationManager>
             return translation;
         }
 
-        string[] values = {
-            "%",
-            CurrentLocale.index,
-            "_",
-            key,
-            "%"
-        };
-        return string.Concat(values);
+        // u suck - Floof
+
+        //string[] values = {
+        //    "%",
+        //    CurrentLocale.index,
+        //    "_",
+        //    key,
+        //    "%"
+        //};
+        //return string.Concat(values);
+
+        return key;
     }
 
     public string GetTranslation(string key, string locale)
