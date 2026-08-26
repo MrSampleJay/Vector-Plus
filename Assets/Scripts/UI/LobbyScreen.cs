@@ -68,7 +68,7 @@ namespace UI
             };
             CreditsButton.PressedAction += () =>
             {
-                ScreenManager.CommingSoon();
+                ScreenManager.Show<CreditsScreen>(true, false);
 
             };
             OptionsButton.PressedAction += () =>

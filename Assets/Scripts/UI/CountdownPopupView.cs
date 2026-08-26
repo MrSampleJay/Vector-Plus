@@ -30,8 +30,9 @@ namespace UI
 			Game.Instance.ScreenManager.ClosePopup();
 			Game.Instance.ScreenManager.Show<GameplayScreen>(false, false);
 			LevelMainController.current.pauseRender = false;
+            SoundsManager.Instance.PauseAll(false);
 
-			yield break;
+            yield break;
         }
 	}
 }

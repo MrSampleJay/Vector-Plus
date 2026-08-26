@@ -38,6 +38,7 @@ namespace UI
                 }
                 Game.Instance.ScreenManager.Show<GameplayPauseScreen>(false, false);
                 LevelMainController.current.pauseRender = true;
+                SoundsManager.Instance.PauseAll(true);
             });
             ButtonReplay.onClick.AddListener(() =>
             {

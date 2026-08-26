@@ -69,7 +69,8 @@ public class LocationManager : AbstractManager<LocationManager>
 				foreach (XmlNode story in group)
 				{
 					string storyName = story.Attributes["Name"].Value;
-					int storyPrice = story.Attributes["UnlockPrice"].ParseInt();
+                    string storyDescription = story.Attributes["Description"].ParseString();
+                    int storyPrice = story.Attributes["UnlockPrice"].ParseInt();
 					UnlockInfo storyCondition = null;
                     if (story["Conditions"] != null)
                     {
@@ -88,8 +89,7 @@ public class LocationManager : AbstractManager<LocationManager>
 					var cutsceneStart = story.Attributes["VideoStart"].ParseString();
                     var cutsceneEnd = story.Attributes["VideoEnd"].ParseString();
 
-
-                    var storyInfo = new StoryInfo(storyName, type, trickIDs, storyCondition, rewardTemplate, cutsceneStart, cutsceneEnd);
+                    var storyInfo = new StoryInfo(storyName, type, trickIDs, storyCondition, rewardTemplate, cutsceneStart, cutsceneEnd, storyDescription);
 					_allStoryInfos[storyInfo.Name] = storyInfo;
                     stories.Add(storyInfo);
                 }

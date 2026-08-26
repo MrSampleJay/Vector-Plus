@@ -247,7 +247,8 @@ namespace Nekki.Vector.Core.Location
             var height = node.Attributes["Height"].ParseFloat();
             var height1 = node.Attributes["Height1"].ParseFloat();
             var sticky = node.Attributes["Sticky"].ParseBool(true);
-            var trapezoid = new TrapezoidRunner(name, type, x, y, width, height, height1, sticky);
+            var material = node.Attributes["Material"].ParseString("");
+            var trapezoid = new TrapezoidRunner(name, type, x, y, width, height, height1, sticky, material);
             trapezoid.Layer = _Parent.Layer;
             trapezoid.SetXmlList(Xml2PrefabUtils.GetTransformationNode(node));
             return trapezoid;
