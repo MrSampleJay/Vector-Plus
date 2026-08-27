@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!-- Configs are for using multiple moves or adding new move configs to the game without modifying the original moves file -->
+<!-- New moves files can follow the same tree structure as moves.xml and config controls what gets parsed in-game with flags like ParseMoves-->
+
+<!-- NOTE! The game still loads without this file if you wish to not use additional move files (Sound Dictionary Parsing on the Main Moves file is yet to be addded)-->
 <Config>
 	<File Name="moves.xml" Main ="1"/>
+	<File Name="sound_manager.xml" ParseSoundDictionaries="0"/>
+	<!-- Sample
+	<File Name="" ParseMoves="1" ParseReactionGroup="1" ParseEventGroups="1" ParseSoundDictionaries="1" ParseConfig="1"/>
+	-->
 </Config>

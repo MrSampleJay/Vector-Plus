@@ -470,11 +470,11 @@ public class LevelMainController
         CanPauseOrReload = true;
         IsDeath = false;
         _FrameCount = 0;
-if (_Location.ResetMusicOnReload)
-{
-    SoundsManager.Instance.StopBackground();
-    SoundsManager.Instance.PlayBackground(_Location.Music, true);
-}
+        if (_Location.ResetMusicOnReload)
+        {
+            SoundsManager.Instance.StopBackground();
+            SoundsManager.Instance.PlayBackground(_Location.Music, true);
+        }
 
         if (_pauseAfterReload)
         {

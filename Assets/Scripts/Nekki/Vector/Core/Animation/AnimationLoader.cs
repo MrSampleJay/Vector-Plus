@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using Core._Common;
@@ -47,95 +48,118 @@ namespace Nekki.Vector.Core.Animation
 
         public void ParseAnimations()
         {
-            XmlNode config = XmlUtils.OpenXMLDocument(_xmlPath, "config.xml")["Config"];
-
-            // Parse Every ReactionGroup and EventGroup First
-            foreach (XmlNode File in config.ChildNodes)
+            XmlNode config = XmlUtils.OpenXMLDocument(_xmlPath, "config.xml", XmlUtils.OpenXmlType.Normal, true, false);
+            if (config != null)
             {
-                XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, File.Attributes["Name"].Value)["root"];
-
-                if (File.Attributes["ParseReactionGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1") 
-                    ParseGroups(xmlNode["ReactionGroups"]);
-
-                if (File.Attributes["ParseEventGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
+                config = config["Config"];
+                // Parse Every ReactionGroup and EventGroup First
+                foreach (XmlNode File in config.ChildNodes)
                 {
-                    foreach (XmlNode childNode in xmlNode["EventGroups"].ChildNodes)
-                        _eventGroups[childNode.Attributes["Name"].Value] = childNode;
+                    XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, File.Attributes["Name"].Value)["root"];
+
+                    if (File.Attributes["ParseReactionGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
+                        ParseGroups(xmlNode["ReactionGroups"]);
+
+                    if (File.Attributes["ParseEventGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
+                    {
+                        foreach (XmlNode childNode in xmlNode["EventGroups"].ChildNodes)
+                            _eventGroups[childNode.Attributes["Name"].Value] = childNode;
+                    }
+                }
+
+                // Parse The Rest
+                foreach (XmlNode File in config.ChildNodes)
+                {
+                    XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, File.Attributes["Name"].Value)["root"];
+
+                    if (File.Attributes["Main"]?.Value == "1")
+                    {
+                        XmlNode movesNode = xmlNode["Moves"];
+                        ParseConfigs(xmlNode["Config"]);
+                        ParseMoves(movesNode);
+                        continue;
+                    }
+
+                    if (File.Attributes["ParseMoves"]?.Value == "1")
+                    {
+                        XmlNode movesNode = xmlNode["Moves"];
+                        ParseMoves(movesNode);
+                    }
+
+                    if (File.Attributes["ParseAnimationIntervals"]?.Value == "1")
+                        ParseExtraIntervals(xmlNode["MoveIntervals"]);
+
+                    if (File.Attributes["ParseSoundDictionaries"]?.Value == "1")
+                    {
+                        Debug.Log("SoundDictionary Loading");
+                        foreach (XmlNode childNode in xmlNode["SoundDictionaries"].ChildNodes)
+                            SoundDictionary.ParseSoundDictionaries(childNode);
+                    }
                 }
             }
-
-            // Parse The Rest
-            foreach (XmlNode File in config.ChildNodes)
+            else
             {
-                XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, File.Attributes["Name"].Value)["root"];
-
-                if (File.Attributes["Main"]?.Value == "1")
-                {
-                    XmlNode movesNode = xmlNode["Moves"];
-                    ParseConfigs(xmlNode["Config"]);
-                    ParseMoves(movesNode);
-                    continue;
-                }
-
-                if (File.Attributes["ParseMoves"]?.Value == "1")
-                {
-                    XmlNode movesNode = xmlNode["Moves"];
-                    ParseMoves(movesNode);
-                }
-
-                if (File.Attributes["ParseAnimationIntervals"]?.Value == "1")
-                    ParseExtraIntervals(xmlNode["MoveIntervals"]);
-
-                if (File.Attributes["ParseSoundDictionaries"]?.Value == "1")
-                {
-                    Debug.Log("SoundDictionary Loading");
-                    foreach (XmlNode childNode in xmlNode["SoundDictionaries"].ChildNodes)
-                        SoundDictionary.ParseSoundDictionaries(childNode);
-                }
+                XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, "moves.xml")["root"];
+                XmlNode movesNode = xmlNode["Moves"];
+                ParseConfigs(xmlNode["Config"]);
+                ParseGroups(xmlNode["ReactionGroups"]);
+                foreach (XmlNode childNode in xmlNode["EventGroups"].ChildNodes)
+                    _eventGroups[childNode.Attributes["Name"].Value] = childNode;
+                ParseMoves(movesNode);
             }
             AnimationBinaryParser.ClearCachedBinary();
         }
 
         public void ParseMoves(XmlNode moves)
         {
-            foreach (XmlNode childNode2 in moves.ChildNodes)
+            XmlNode currentWorkingNode = null;
+            try
             {
-                AnimationInfo animationInfo = null;
-                animationInfo = ((childNode2.Attributes["Trick"] != null && XmlUtils.ParseInt(childNode2.Attributes["Trick"]) != 0) ? new AnimationTrickInfo(childNode2) : new AnimationInfo(childNode2));
-
-                string BinaryPath = moves.Attributes["BinPath"]?.Value;
-
-                if (!string.IsNullOrEmpty(BinaryPath))
-                    animationInfo.Folder = BinaryPath;
-
-                foreach (XmlNode childNode3 in childNode2.ChildNodes)
+                foreach (XmlNode childNode2 in moves.ChildNodes)
                 {
-                    if (childNode3.Name != "Interval")
+                    currentWorkingNode = childNode2;
+                    AnimationInfo animationInfo = null;
+                    animationInfo = ((childNode2.Attributes["Trick"] != null && XmlUtils.ParseInt(childNode2.Attributes["Trick"]) != 0) ? new AnimationTrickInfo(childNode2) : new AnimationInfo(childNode2));
+
+                    string BinaryPath = moves.Attributes["BinPath"]?.Value;
+
+                    if (!string.IsNullOrEmpty(BinaryPath))
+                        animationInfo.Folder = BinaryPath;
+
+                    foreach (XmlNode childNode3 in childNode2.ChildNodes)
                     {
-                        continue;
-                    }
-                    AnimationInterval animationInterval = null;
-                    if (childNode3.Attributes["Groups"] == null)
-                    {
-                        animationInterval = new AnimationInterval(childNode3);
-                    }
-                    else
-                    {
-                        List<XmlNode> list = new List<XmlNode>();
-                        string[] array = childNode3.Attributes["Groups"].Value.Split('|');
-                        foreach (string key in array)
+                        if (childNode3.Name != "Interval")
                         {
-                            if (!_eventGroups.ContainsKey(key))
-                            {
-                                continue;
-                            }
-                            list.Add(_eventGroups[key]);
+                            continue;
                         }
-                        animationInterval = new AnimationInterval(childNode3, list);
-                    }
-                    animationInfo.Intervals.Add(animationInterval);
-                }// Interval Processing
-                Animations.Animation[animationInfo.Name] = animationInfo;
+                        AnimationInterval animationInterval = null;
+                        if (childNode3.Attributes["Groups"] == null)
+                        {
+                            animationInterval = new AnimationInterval(childNode3);
+                        }
+                        else
+                        {
+                            List<XmlNode> list = new List<XmlNode>();
+                            string[] array = childNode3.Attributes["Groups"].Value.Split('|');
+                            foreach (string key in array)
+                            {
+                                if (!_eventGroups.ContainsKey(key))
+                                {
+                                    DebugUtils.Dialog($"Unknown EventGroup: {key} \n Where: {childNode2.Name}", false);
+                                    continue;
+                                }
+                                list.Add(_eventGroups[key]);
+                            }
+                            animationInterval = new AnimationInterval(childNode3, list);
+                        }
+                        animationInfo.Intervals.Add(animationInterval);
+                    }// Interval Processing
+                    Animations.Animation[animationInfo.Name] = animationInfo;
+                }
+            }
+            catch (Exception ex)
+            {
+                DebugUtils.Dialog($"Error: Failed Parsing Moves! \n Message: {ex.Message} \n Where: {currentWorkingNode.Name}", true, true);
             }
         }
         public void ParseExtraIntervals(XmlNode moves)

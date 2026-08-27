@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="Windows-1251"?>
+<root>
+	<!-- OwO! XML Tree Structure Subject to Change (Cuz this kinda sucks)!-->
+	<SoundDictionaries>
+		<Sound Original="m_jump1">
+			<Voice Type="" Sound=""/>
+		</Sound>
+		
+		<Sound Original="step1">
+			<Material Type="2" Sound=""/>
+		</Sound>
+	</SoundDictionaries>
+</root>
