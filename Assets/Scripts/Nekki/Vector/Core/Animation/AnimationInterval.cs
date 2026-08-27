@@ -274,7 +274,7 @@ namespace Nekki.Vector.Core.Animation
                     }
 					else
 					{
-                        AnimationSound newSound = new AnimationSound(childNode.Attributes["Name"].Value, int.Parse(childNode.Attributes["Type"].Value), XmlUtils.ParseString(childNode.Attributes["Voice"], null));
+                        AnimationSound newSound = new AnimationSound(childNode.Attributes["Name"].Value, childNode.Attributes["Type"].ParseInt(), childNode.Attributes["Voice"].ParseString(null));
                         list2.Add(newSound);
                     }
                 }

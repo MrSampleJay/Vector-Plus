@@ -57,14 +57,14 @@ namespace Nekki.Vector.Core.Animation
                 {
                     XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, File.Attributes["Name"].Value)["root"];
 
-                    if (File.Attributes["ParseReactionGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
-                        ParseGroups(xmlNode["ReactionGroups"]);
-
                     if (File.Attributes["ParseEventGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
                     {
                         foreach (XmlNode childNode in xmlNode["EventGroups"].ChildNodes)
                             _eventGroups[childNode.Attributes["Name"].Value] = childNode;
                     }
+
+                    if (File.Attributes["ParseReactionGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
+                        ParseGroups(xmlNode["ReactionGroups"]);
                 }
 
                 // Parse The Rest
@@ -102,9 +102,11 @@ namespace Nekki.Vector.Core.Animation
                 XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, "moves.xml")["root"];
                 XmlNode movesNode = xmlNode["Moves"];
                 ParseConfigs(xmlNode["Config"]);
-                ParseGroups(xmlNode["ReactionGroups"]);
                 foreach (XmlNode childNode in xmlNode["EventGroups"].ChildNodes)
+                {
                     _eventGroups[childNode.Attributes["Name"].Value] = childNode;
+                }
+                ParseGroups(xmlNode["ReactionGroups"]);
                 ParseMoves(movesNode);
             }
             AnimationBinaryParser.ClearCachedBinary();
@@ -112,16 +114,17 @@ namespace Nekki.Vector.Core.Animation
 
         public void ParseMoves(XmlNode moves)
         {
-            XmlNode currentWorkingNode = null;
+            XmlNode currentWorkingMove = null;
+            int intervalIndex = -1;
             try
             {
                 foreach (XmlNode childNode2 in moves.ChildNodes)
                 {
-                    currentWorkingNode = childNode2;
+                    currentWorkingMove = childNode2;
                     AnimationInfo animationInfo = null;
                     animationInfo = ((childNode2.Attributes["Trick"] != null && XmlUtils.ParseInt(childNode2.Attributes["Trick"]) != 0) ? new AnimationTrickInfo(childNode2) : new AnimationInfo(childNode2));
 
-                    string BinaryPath = moves.Attributes["BinPath"]?.Value;
+                    string BinaryPath = moves.Attributes["BinPath"].ParseString();
 
                     if (!string.IsNullOrEmpty(BinaryPath))
                         animationInfo.Folder = BinaryPath;
@@ -132,6 +135,8 @@ namespace Nekki.Vector.Core.Animation
                         {
                             continue;
                         }
+                        intervalIndex++;
+
                         AnimationInterval animationInterval = null;
                         if (childNode3.Attributes["Groups"] == null)
                         {
@@ -154,12 +159,14 @@ namespace Nekki.Vector.Core.Animation
                         }
                         animationInfo.Intervals.Add(animationInterval);
                     }// Interval Processing
+                    intervalIndex = 0;
+
                     Animations.Animation[animationInfo.Name] = animationInfo;
                 }
             }
             catch (Exception ex)
             {
-                DebugUtils.Dialog($"Error: Failed Parsing Moves! \n Message: {ex.Message} \n Where: {currentWorkingNode.Name}", true, true);
+                DebugUtils.Dialog($"Error: Failed Parsing Moves! \n Message: {ex.Message} \n Move: {currentWorkingMove.Name} \n Interval: {intervalIndex}", false, true);
             }
         }
         public void ParseExtraIntervals(XmlNode moves)
