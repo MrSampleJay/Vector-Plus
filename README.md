@@ -1,19 +1,27 @@
-Modified Version of Vision's Vector 1.4.4 Decompilation. Mostly ported features from Vector 2 that enhance the game.
+Modified Version of Vision`s Vector 1.4.4 Decompilation that feature small tweaks and ported features from Vector 2.
 
-It is currently WIP but expect some features coming in a couple weeks.
+## Current Release: Build 1.0
 
-## Planned Features
+### Changes
+- Added Directional Filters for Models that interact with Areas: `Direction="1"` Facing Right only, `Direction="-1"` facing Left only.
+- Added a `ResetOnReload` Flag to Music (In Levels) `<Music Name="Music" ResetOnReload="1">`.
+- Added a Track Description to Tracks `<Track Name="DOWNTOWN_STORY_01" Description="Your Text Here">` This shows up before you play the level.
+- Ported Impulse Trigger Action from Vector 2: `<Impulse R="float" Model="Player" Impulse="float" Absorption="float">` Produces an impulse effect similar to ForceBlasters. Origin is at the Center of the Trigger. Only works if models are on physics simulation.
+- Added a Frames Attribute to Camera Zooms `<Camera Zoom="0.5" Frames="30">`. Default is 30 Frames.
+- Added a StopX and StopY Attribute to Camera Actions. Input is Coordinates.
+- Added Materials to Platforms `<Platform Material="">`. (Edit `sound_manager.xml` to make material presets)
+- Added Voice to Models `<Model Voice="Male">`. (Edit `sound_manager.xml` to make voice presets)
+- Music and Sounds are now paused when pausing the game.
+- Small UI Tweaks
 
-- Porting Trigger Actions From Vector 2
-- Implement Unique Voices depending on Models
-- Port Multiply shaders from Vector 2
-- Modular Move Configuration (Multiple XML Files For Moves)
-- Music Controls
-- Music Stop on Pause
+## Currently Working but Subject to Change
 
-## Vectorier
+- Voice and Material XML Tree
+- Modular Move Config Parsing (Unfinished at the Moment).
 
-Please check out Vectorier editor for making custom levels for this and the original pc version.
+## Note About Vectorier
+
+Vectorier may not support the underlying features (e.g added attributes to objects, models) in the editor and may need modification in order to use them.
 
 ## DISCLAIMER
 
