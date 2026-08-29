@@ -17,7 +17,7 @@ Modified Version of Vision`s Vector 1.4.4 Decompilation that feature small tweak
 ## Currently Working but Subject to Change
 
 - Voice and Material XML Tree
-- Modular Move Config Parsing (Unfinished at the Moment).
+- Modular Move Parsing (Unfinished at the Moment, I highly advise not using the config.xml as it is going under heavy changes).
 
 ## Note About Vectorier
 
