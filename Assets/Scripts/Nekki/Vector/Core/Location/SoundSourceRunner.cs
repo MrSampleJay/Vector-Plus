@@ -41,6 +41,7 @@ namespace Nekki.Vector.Core.Location
         private int _EndSoundFrame;
 
         private AudioRolloffMode _RolloffMode;
+
         private bool _StopCallingRender;
 
         public SoundSourceRunner(float p_x, float p_y, XmlNode p_node)
@@ -74,6 +75,7 @@ namespace Nekki.Vector.Core.Location
             XmlNode xmlNode = p_soundSourceNode["Properties"]["Static"]["Sound"];
             _SoundName = XmlUtils.ParseString(xmlNode.Attributes["Name"], string.Empty);
             _Looped = XmlUtils.ParseBool(xmlNode.Attributes["Looped"]);
+
             if (xmlNode != null && xmlNode.HasChildNodes)
             {
                 IntervalVolume item = new IntervalVolume(xmlNode.FirstChild);

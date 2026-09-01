@@ -57,13 +57,18 @@ namespace Nekki.Vector.Core.Animation
                 {
                     XmlNode xmlNode = XmlUtils.OpenXMLDocument(_xmlPath, File.Attributes["Name"].Value)["root"];
 
-                    if (File.Attributes["ParseEventGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
+                    if (File.Attributes["Config"].ParseInt() == 1)
+                    {
+                        ParseConfigs(xmlNode["Config"]);
+                    }
+
+                    if (File.Attributes["EventGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
                     {
                         foreach (XmlNode childNode in xmlNode["EventGroups"].ChildNodes)
                             _eventGroups[childNode.Attributes["Name"].Value] = childNode;
                     }
 
-                    if (File.Attributes["ParseReactionGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
+                    if (File.Attributes["ReactionGroups"]?.Value == "1" || File.Attributes["Main"]?.Value == "1")
                         ParseGroups(xmlNode["ReactionGroups"]);
                 }
 
@@ -80,16 +85,16 @@ namespace Nekki.Vector.Core.Animation
                         continue;
                     }
 
-                    if (File.Attributes["ParseMoves"]?.Value == "1")
+                    if (File.Attributes["Moves"]?.Value == "1")
                     {
                         XmlNode movesNode = xmlNode["Moves"];
                         ParseMoves(movesNode);
                     }
 
-                    if (File.Attributes["ParseAnimationIntervals"]?.Value == "1")
+                    if (File.Attributes["Intervals"]?.Value == "1")
                         ParseExtraIntervals(xmlNode["MoveIntervals"]);
 
-                    if (File.Attributes["ParseSoundDictionaries"]?.Value == "1")
+                    if (File.Attributes["SoundDictionaries"]?.Value == "1")
                     {
                         Debug.Log("SoundDictionary Loading");
                         foreach (XmlNode childNode in xmlNode["SoundDictionaries"].ChildNodes)
@@ -150,7 +155,7 @@ namespace Nekki.Vector.Core.Animation
                             {
                                 if (!_eventGroups.ContainsKey(key))
                                 {
-                                    DebugUtils.Dialog($"Unknown EventGroup: {key} \n Where: {childNode2.Name}", false);
+                                    Debug.Log($"Unknown EventGroup: {key} \n Move: {childNode2.Name}");
                                     continue;
                                 }
                                 list.Add(_eventGroups[key]);
@@ -164,9 +169,9 @@ namespace Nekki.Vector.Core.Animation
                     Animations.Animation[animationInfo.Name] = animationInfo;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                DebugUtils.Dialog($"Error: Failed Parsing Moves! \n Message: {ex.Message} \n Move: {currentWorkingMove.Name} \n Interval: {intervalIndex}", false, true);
+                DebugUtils.Dialog($"Error: Failed Parsing Moves! \n Move: {currentWorkingMove.Name} \n Interval: {intervalIndex}", false, true);
             }
         }
         public void ParseExtraIntervals(XmlNode moves)

@@ -144,7 +144,7 @@ namespace Nekki.Vector.Core.Animation
             get;
         }
 
-        private AnimationInfo Info
+        public AnimationInfo Info
         {
             get
             {
@@ -153,6 +153,10 @@ namespace Nekki.Vector.Core.Animation
                     _info = Animations.Animation[Name];
                 }
                 return _info;
+            }
+            set
+            {
+                _info = value;
             }
         }
 

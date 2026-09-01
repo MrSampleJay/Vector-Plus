@@ -29,6 +29,17 @@ public class ItemGO : MonoBehaviour
 
     private Vector3 _defaultTextPos;
 
+    public string AtlasIdle {
+        get => _atlas;
+        set => _atlas = value;
+    }
+
+    public string AtalasOff
+    {
+        get => _atlasEnd;
+        set => _atlasEnd = value;
+    }
+
     public Color color
     {
         set => _spriteRenderer.color = value;

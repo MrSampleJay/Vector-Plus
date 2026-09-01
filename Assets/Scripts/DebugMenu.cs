@@ -61,7 +61,7 @@ public class DebugMenu : MonoBehaviour
 
     public void Init()
 	{
-        if (Game.Instance.Snail && Game.Instance.SnailSett.ShowUI)
+        if ((Game.Instance.Snail && Game.Instance.SnailSett.ShowUI) || Game.Instance.ForceShowStats)
         {
             FPSMeter.gameObject.SetActive(true);
             RunStats.gameObject.SetActive(true);

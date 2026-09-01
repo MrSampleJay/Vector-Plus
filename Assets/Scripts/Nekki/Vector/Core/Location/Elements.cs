@@ -263,7 +263,9 @@ namespace Nekki.Vector.Core.Location
             if (type == 0)
             {
                 int score = node.Attributes["Score"].ParseInt();
-                item = new ItemScoreRunner(type, "ScoreItem", score, x, y);
+                string animIdle = node.Attributes["IdleClassName"].ParseString("bonus_v4");
+                string animOff =  node.Attributes["OffClassName"].ParseString("bonus_v4_off");
+                item = new ItemScoreRunner(type, "ScoreItem", score, x, y, animIdle, animOff);
             }
             else
             {

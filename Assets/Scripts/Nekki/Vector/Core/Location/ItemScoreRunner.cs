@@ -12,6 +12,8 @@ namespace Nekki.Vector.Core.Location
 
         protected ItemGO _content;
 
+        protected string _animationIdle, _animationOff;
+
         protected float _x;
 
         protected float _y;
@@ -24,7 +26,7 @@ namespace Nekki.Vector.Core.Location
             set => _score = value;
         }
 
-        public ItemScoreRunner(int type, string prefabName, int score, float x, float y)
+        public ItemScoreRunner(int type, string prefabName, int score, float x, float y, string animationIdle = "bonus_v4", string animationOff = "bonus_v4_off")
             : base(x, y, type)
         {
             _type = type;
@@ -32,6 +34,8 @@ namespace Nekki.Vector.Core.Location
             _x = x;
             _y = y;
             _prefabName = prefabName;
+            _animationIdle = animationIdle;
+            _animationOff = animationOff;
         }
 
         protected override void SerializeData()
@@ -58,6 +62,8 @@ namespace Nekki.Vector.Core.Location
         {
             base.InitRunner(point, serialize);
             _content = _UnityObject.GetComponent<ItemGO>();
+            _content.AtlasIdle = _animationIdle;
+            _content.AtalasOff = _animationOff;
             _content.Init();
             UpdateUnityObjectPosition(Position);
         }

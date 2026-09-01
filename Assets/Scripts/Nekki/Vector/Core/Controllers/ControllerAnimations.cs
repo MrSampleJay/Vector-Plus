@@ -210,7 +210,7 @@ namespace Nekki.Vector.Core.Controllers
             _ModelObject = model.ModelObject;
         }
 
-        private void Init(AnimationInfo info, bool reverse, int firstFrame)
+        private void Init(AnimationInfo info, bool reverse, int firstFrame, string pivotNode)
         {
             _Buffer.Reset();
             _Frames.Reset();
@@ -225,7 +225,7 @@ namespace Nekki.Vector.Core.Controllers
             _EndFrame = info.EndFrame;
             Animation.CloneFrames(_FirstFrame, _EndFrame, _Frames, 0);
             SetInterruptFrames();
-            _PivotNode = info.PivotNode;
+            _PivotNode = pivotNode == null ? info.PivotNode : pivotNode;
             _CurrentNode = _ModelObject.GetNodeIdByName(_PivotNode);
             ShiftPoint();
             VelocityPoint();
@@ -303,11 +303,11 @@ namespace Nekki.Vector.Core.Controllers
             Stop();
         }
 
-        public void Play(AnimationInfo p_info, bool p_reverse, int p_firstFrame)
+        public void Play(AnimationInfo p_info, bool p_reverse, int p_firstFrame, string pivotNode = "NPivot")
         {
             if (p_info != null)
             {
-                Init(p_info, p_reverse, p_firstFrame);
+                Init(p_info, p_reverse, p_firstFrame, pivotNode);
             }
         }
 

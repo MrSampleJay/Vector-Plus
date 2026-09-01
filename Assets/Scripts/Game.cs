@@ -16,6 +16,8 @@ public class Game
 
     private bool _needShowRefreshApplication;
 
+    public bool ForceShowStats = false;
+
     public ScreenManager ScreenManager;
 
     public class SnailSettings

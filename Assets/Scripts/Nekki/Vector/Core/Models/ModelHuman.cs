@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Nekki.Vector.Core.Animation;
 using Nekki.Vector.Core.Animation.Events;
 using Nekki.Vector.Core.Camera;
@@ -9,6 +7,9 @@ using Nekki.Vector.Core.Gadgets;
 using Nekki.Vector.Core.Location;
 using Nekki.Vector.Core.Node;
 using Nekki.Vector.Core.User;
+using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 using AnimationInfo = Nekki.Vector.Core.Animation.AnimationInfo;
 using Collision = Nekki.Vector.Core.Result.Collision;
@@ -366,7 +367,7 @@ namespace Nekki.Vector.Core.Models
                 LevelMainController.current.Death(this, 1);
                 return;
             }
-            PlayAnimation(reaction.Name, reaction.Reverse, reaction.FirstFrame);
+            PlayAnimation(_userData.Animation(reaction.Name), reaction.Reverse, reaction.FirstFrame, reaction.PivotNode);
         }
 
         public void PlayAnimation(string name, bool reverse = false, int firstFrame = -1)
@@ -378,13 +379,32 @@ namespace Nekki.Vector.Core.Models
             PlayAnimation(_userData.Animation(name), reverse, firstFrame);
         }
 
-        public void PlayAnimation(AnimationInfo info, bool reverse, int firstFrame)
+        public void PlayAnimation(string name, string pivotNode, bool reverse = false, int firstFrame = -1)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+            AnimationInfo animationInfo = _userData.Animation(name);
+            if (pivotNode != null)
+            {
+                string last_pivotNode = animationInfo.PivotNode;
+                animationInfo.PivotNode = pivotNode;
+                PlayAnimation(animationInfo, reverse, firstFrame);
+                animationInfo.PivotNode = last_pivotNode;
+            }
+            else
+                PlayAnimation(animationInfo, reverse, firstFrame);
+        }
+
+        public void PlayAnimation(AnimationInfo info, bool reverse, int firstFrame, string pivotNode = null)
         {
             _ControllerPhysics.Stop();
             _controllerAnimations.Stop();
-            _controllerAnimations.Play(info, reverse, firstFrame);
+            _controllerAnimations.Play(info, reverse, firstFrame, pivotNode);
             _controllerStatistics.SetAnimation(info);
         }
+
 
         public void StopAnimation()
         {

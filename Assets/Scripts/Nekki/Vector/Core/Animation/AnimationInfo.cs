@@ -93,6 +93,7 @@ namespace Nekki.Vector.Core.Animation
         public string PivotNode
         {
             get;
+            set;
         }
 
         public int Priority

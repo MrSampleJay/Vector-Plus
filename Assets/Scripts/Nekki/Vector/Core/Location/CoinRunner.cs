@@ -22,7 +22,7 @@ namespace Nekki.Vector.Core.Location
 		public int GroupID => _groupID;
 
 		public CoinRunner(int type, string prefabName, int groupId, int score, float x, float y)
-			: base(type, prefabName, score, x, y)
+			: base(type, prefabName, score, x, y, "credits", "credits_off")
 		{
 			_groupID = groupId;
 			_defaultScore = score;
